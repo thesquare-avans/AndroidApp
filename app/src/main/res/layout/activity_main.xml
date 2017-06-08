@@ -23,5 +23,13 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true" />
 
+    <ListView
+        android:layout_height="220dp"
+        android:layout_alignParentStart="true"
+        android:foregroundGravity="bottom|left"
+        android:layout_width="220dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginEnd="0dp"
+        android:id="@+id/lvChat" />
 
 </RelativeLayout>

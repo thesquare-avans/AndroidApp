@@ -27,11 +27,15 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import static android.R.id.list;
 import static me.thesquare.R.id.btnSwitch;
 
 public class MainActivity extends AppCompatActivity  implements View.OnClickListener {
@@ -70,7 +74,17 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         textureView.setSurfaceTextureListener(textureListener);
         ImageButton btn2 = (ImageButton)findViewById(R.id.btnSwitch);
         btn2.setOnClickListener(this);
+        //set items
+        List<chatItem> test = new ArrayList<>();
+        chatItem c = new chatItem();
+        c.chatname = "lars";
+        c.chattext = "sdfasdfasdfsdfasdfasdf";
+        test.add(c);
+        // end items
+        ListView listView = (ListView) findViewById(R.id.lvChat);
+        chatListViewAdapter adapter = new chatListViewAdapter(this,getLayoutInflater(), (ArrayList<chatItem>) test);
 
+        listView.setAdapter(adapter);
     }
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
         @Override
