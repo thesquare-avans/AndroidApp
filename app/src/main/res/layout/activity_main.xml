@@ -23,6 +23,16 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true" />
 
+
+    <ListView
+        android:layout_height="220dp"
+        android:layout_alignParentStart="true"
+        android:foregroundGravity="bottom|left"
+        android:layout_width="220dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginEnd="0dp"
+        android:id="@+id/lvChat" />
+
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
@@ -43,6 +53,5 @@
         android:shadowRadius="10"
         android:layout_alignParentBottom="true"
         android:layout_alignEnd="@+id/btnSwitch" />
-
 
 </RelativeLayout>
