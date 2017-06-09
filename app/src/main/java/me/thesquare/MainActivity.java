@@ -39,9 +39,21 @@ public class MainActivity extends AppCompatActivity  {
         //set items
         List<chatItem> test = new ArrayList<>();
         chatItem c = new chatItem();
-        c.chatname = "lars";
-        c.chattext = "sdfasdfasdfsdfasdfasdf";
+        c.chatname = "lars1337";
+        c.chattext = "Hallo, ik ben een Larsson!";
+        chatItem chat2 = new chatItem();
+        chat2.chatname = "TheRubenGames";
+        chat2.chattext = "Play the 2 mana card kappa :Omegalul:";
+        chatItem chat3 = new chatItem();
+        chat3.chatname = "CliffordLovesChicks";
+        chat3.chattext = "Show boobs please!";
+        chatItem chat4 = new chatItem();
+        chat4.chatname = "AntonTestoBom";
+        chat4.chattext = "Even een boterhammetje eten! #pindakaas";
         test.add(c);
+        test.add(chat2);
+        test.add(chat3);
+        test.add(chat4);
         // end items
         ListView listView = (ListView) findViewById(R.id.lvChat);
         chatListViewAdapter adapter = new chatListViewAdapter(this,getLayoutInflater(), (ArrayList<chatItem>) test);
