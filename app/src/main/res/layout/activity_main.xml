@@ -26,22 +26,27 @@
 
     <ListView
         android:layout_height="220dp"
-        android:layout_alignParentStart="true"
         android:foregroundGravity="bottom|left"
         android:layout_width="220dp"
-        android:layout_alignBottom="@id/texture"
-        android:layout_marginBottom="0dp"
-        android:layout_marginEnd="0dp"
-        android:id="@+id/lvChat" />
+        android:id="@+id/lvChat"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:textSize="20sp"
+        android:textColor="#ffffff"
+        android:shadowColor="#000000"
+        android:shadowDx="5"
+        android:shadowDy="5"
+        android:shadowRadius="5"
+        />
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/projectpepe"
-        android:layout_marginEnd="12dp"
-        android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/viewCounter" />
+        app:srcCompat="@drawable/borderwhiteeye"
+        android:layout_marginStart="17dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:id="@+id/viewCounter"
@@ -49,10 +54,13 @@
         android:layout_height="wrap_content"
         android:text="123456"
         android:textSize="20sp"
-       android:textColor="#ba0909"
+       android:textColor="#ffffff"
         android:shadowColor="#000000"
-        android:shadowRadius="10"
-        android:layout_alignParentBottom="true"
-        android:layout_alignEnd="@+id/btnSwitch" />
+        android:shadowDx="5"
+        android:shadowDy="5"
+        android:shadowRadius="5"
+        android:layout_marginStart="45dp"
+        android:layout_alignBottom="@+id/imageView"
+        android:layout_alignStart="@+id/imageView" />
 
 </RelativeLayout>
