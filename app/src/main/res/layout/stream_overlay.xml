@@ -9,7 +9,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_logo"
+        app:srcCompat="@drawable/square_logo"
         android:id="@+id/imageView2"
         android:layout_weight="0.35" />
 
