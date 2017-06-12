@@ -1,33 +1,18 @@
 package me.thesquare;
 
-<<<<<<< HEAD
 import android.os.Bundle;
-=======
-
-import android.content.Intent;
-import android.content.SharedPreferences.Editor;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
->>>>>>> origin/Develop
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.TextureView;
 import android.widget.ImageButton;
 import android.widget.ListView;
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/Develop
 import java.util.ArrayList;
 import java.util.List;
 import net.majorkernelpanic.streaming.SessionBuilder;
 import net.majorkernelpanic.streaming.gl.SurfaceView;
 import net.majorkernelpanic.streaming.rtsp.RtspServer;
 
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/Develop
 public class MainActivity extends AppCompatActivity  {
 
     private TextureView textureView;
