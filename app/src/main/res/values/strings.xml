@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">The Square</string>
+    <string name="request_permissions">Enable these permissions to use The Square</string>
+    <string name="camera">Camera</string>
+    <string name="microphone">Microphone</string>
+    <string name="enter_app">Enter the Square</string>
 </resources>
