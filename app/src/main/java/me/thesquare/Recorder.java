@@ -49,7 +49,7 @@ public class Recorder extends TimerTask implements Runnable {
         mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mediaRecorder.setAudioEncodingBitRate(128);
         mediaRecorder.setVideoFrameRate(25);
-        mediaRecorder.setVideoSize(cameraPreview.getWidth(), cameraPreview.getHeight());
+        mediaRecorder.setVideoSize(640, 480);
         mediaRecorder.setPreviewDisplay(this.cameraPreview.getHolder().getSurface());
         mediaRecorder.setOutputFile(outputFile.getFD());
         mediaRecorder.prepare();

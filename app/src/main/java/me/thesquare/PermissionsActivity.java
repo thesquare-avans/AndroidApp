@@ -56,7 +56,9 @@ public class PermissionsActivity extends Activity implements EasyPermissions.Per
         btnEnter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // do stuff here
+                Intent i = new Intent(view.getContext(),MainActivity.class);
+                startActivityForResult(i,0);
+
             }
         });
     }
