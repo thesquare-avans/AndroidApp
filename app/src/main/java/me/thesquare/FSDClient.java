@@ -18,7 +18,7 @@ import java.util.Arrays;
  * Created by Anthony on 13-6-2017.
  */
 
-public class FSDClient implements  FragmentWriter{
+public class FSDClient implements FragmentWriter {
     //The signature
     private PrivateKey privateKey;
     //The socket to output to
