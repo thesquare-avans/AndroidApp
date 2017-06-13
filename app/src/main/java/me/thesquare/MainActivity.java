@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
@@ -21,6 +23,12 @@ public class MainActivity extends AppCompatActivity {
     private Camera cam;
     private Record record;
     private int fileCount;
+    private EditText chatinput;
+    private String username;
+    ListView listView;
+    ApiHandler apiHandler;
+    private List<chatItem> chat = new ArrayList<>();
+    private chatListViewAdapter chatadapter;
     private static final String TAG = "AndroidCameraApi";
 
     @Override
@@ -37,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         fileCount = 1;
         ImageButton btn2 = (ImageButton)findViewById(R.id.btnSwitch);
         //set items
-        List<chatItem> test = new ArrayList<>();
+
         chatItem c = new chatItem();
         c.chatname = "lars1337";
         c.chattext = "Hallo, ik ben een Larsson!";
@@ -50,15 +58,17 @@ public class MainActivity extends AppCompatActivity {
         chatItem chat4 = new chatItem();
         chat4.chatname = "AntonTestoBom";
         chat4.chattext = "Even een boterhammetje eten! #pindakaas";
-        test.add(c);
-        test.add(chat2);
-        test.add(chat3);
-        test.add(chat4);
+        chat.add(c);
+        chat.add(chat2);
+        chat.add(chat3);
+        chat.add(chat4);
         // end items
-        ListView listView = (ListView) findViewById(R.id.lvChat);
-        chatListViewAdapter adapter = new chatListViewAdapter(this,getLayoutInflater(), (ArrayList<chatItem>) test);
+        chatinput = (EditText)findViewById(R.id.chatinput);
+        listView = (ListView) findViewById(R.id.lvChat);
+        chatadapter = new chatListViewAdapter(this,getLayoutInflater(), (ArrayList<chatItem>) chat);
 
-        listView.setAdapter(adapter);
+
+        listView.setAdapter(chatadapter);
 
 //        cam = new Camera(textureView, btn2, this, MainActivity.this);
 
@@ -95,4 +105,20 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 //        cam.resume();
     }
+    public void AddChat(View view){
+
+        chatItem addChat = new chatItem();
+        username = "Testuser";
+        addChat.chatname = username;
+        addChat.chattext = chatinput.getText().toString();
+        chat.add(addChat);
+        chatinput.setText("");
+        chatadapter.notifyDataSetChanged();
+        int chatsize = chat.size();
+        if (chatsize >= 5){
+            chat.remove(0);
+            chatadapter.notifyDataSetChanged();
+        }
+    }
+
 }

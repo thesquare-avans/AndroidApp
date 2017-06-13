@@ -10,10 +10,9 @@
         android:id="@+id/texture"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
         android:onClick="onCaptureClick"
-        />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -32,16 +31,35 @@
         android:foregroundGravity="bottom|left"
         android:layout_width="220dp"
         android:id="@+id/lvChat"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
         android:textSize="20sp"
         android:textColor="#ffffff"
         android:shadowColor="#000000"
         android:shadowDx="5"
         android:shadowDy="5"
         android:shadowRadius="5"
-        />
+        android:layout_above="@+id/chatinput"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="35dp" />
 
+    <EditText
+        android:id="@+id/chatinput"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Chat here..."
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="53dp" />
+
+    <Button
+        android:id="@+id/btnChat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:text="chat"
+        android:onClick="AddChat"
+        android:layout_alignBaseline="@+id/chatinput"
+        android:layout_alignBottom="@+id/chatinput"
+        android:layout_alignEnd="@+id/btnSwitch" />
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
@@ -62,6 +80,7 @@
         android:layout_marginStart="45dp"
         android:gravity="center_vertical"
         android:shadowColor="#000000"
+        android:clickable="false"
         android:shadowDx="5"
         android:shadowDy="5"
         android:shadowRadius="5"

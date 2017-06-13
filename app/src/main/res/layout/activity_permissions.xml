@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#333333">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:src="@drawable/square_logo"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="@string/request_permissions"
+        android:textAlignment="center"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:id="@+id/buttonCam"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginTop="32dp"
+        android:gravity="center"
+        android:orientation="vertical">
+        <com.github.zagum.switchicon.SwitchIconView
+            android:layout_width="wrap_content"
+            android:id="@+id/cameraIconView"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            app:si_animation_duration="500"
+            app:si_disabled_alpha=".3"
+            app:si_disabled_color="#e2e2e2"
+            app:si_tint_color="#4caf50"
+            app:si_enabled="false"
+            app:si_no_dash="false"
+            app:srcCompat="@drawable/ic_camera"/>
+        <TextView
+            android:id="@+id/textViewCam"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/camera"/>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/buttonMic"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginTop="32dp"
+        android:gravity="center"
+        android:orientation="vertical">
+        <com.github.zagum.switchicon.SwitchIconView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/micIconView"
+            android:padding="16dp"
+            app:si_animation_duration="500"
+            app:si_disabled_alpha=".3"
+            app:si_disabled_color="#e2e2e2"
+            app:si_tint_color="#4caf50"
+            app:si_enabled="false"
+            app:si_no_dash="false"
+            app:srcCompat="@drawable/ic_microphone"/>
+        <TextView
+            android:id="@+id/textViewMic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/microphone"/>
+    </LinearLayout>
+
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/btnEnter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:text="@string/enter_app"
+            android:enabled="false"/>
+    </RelativeLayout>
+
+
+
+
+
+</LinearLayout>
