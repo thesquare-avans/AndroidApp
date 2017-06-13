@@ -4,4 +4,6 @@
     <string name="camera">Camera</string>
     <string name="microphone">Microphone</string>
     <string name="enter_app">Enter the Square</string>
+    <string name="permission_text_cam">We need Camere permissions.</string>
+    <string name="permission_text_mic">We need Microphone permissions.</string>
 </resources>
