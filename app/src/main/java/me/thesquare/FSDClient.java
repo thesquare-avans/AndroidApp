@@ -31,32 +31,22 @@ public class FSDClient implements FragmentWriter {
 
     private void hashSignAndSendData(byte[] fragment){
             try {
-                Signature signature = Signature.getInstance("SHA256withRSA");
-                signature.initSign(privateKey);
-                signature.update(fragment);
+                //Signature signature = Signature.getInstance("SHA256withRSA");
+                //signature.initSign(privateKey);
+                //signature.update(fragment);
 
-                int totalLength = fragment.length + 4 + 256;
+                int totalLength = fragment.length;
                 // The length of the data+length+signed and hashed data
                 byte[] bytesPackageLength = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(totalLength).array();
-                byte[] signedSignature = signature.sign();
+                outputStream.write(bytesPackageLength);
+                //byte[] signedSignature = signature.sign();
 
-                byte[] allData = new byte[totalLength];
-                //copy length to array
-                System.arraycopy(bytesPackageLength,0,allData,0,bytesPackageLength.length);
                 //Copy signed data to array
-                System.arraycopy(signedSignature,0,allData,bytesPackageLength.length,signedSignature.length);
-                //Copy video data to array
-                System.arraycopy(fragment,0,allData,bytesPackageLength.length+signedSignature.length,fragment.length);
-                //Write to the socket
+                //System.arraycopy(signedSignature,0,allData,bytesPackageLength.length,signedSignature.length);
+                outputStream.write(new byte[256]);
                 outputStream.write(fragment);
 
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (SignatureException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InvalidKeyException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
     }
