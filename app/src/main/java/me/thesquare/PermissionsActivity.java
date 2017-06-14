@@ -13,6 +13,8 @@ import com.github.zagum.switchicon.SwitchIconView;
 
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -31,7 +33,7 @@ public class PermissionsActivity extends Activity implements EasyPermissions.Per
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        initDatabase();
         setContentView(R.layout.activity_permissions);
         cameraIconView = (SwitchIconView) findViewById(R.id.cameraIconView);
         micIconView = (SwitchIconView) findViewById(R.id.micIconView);
@@ -158,5 +160,11 @@ public class PermissionsActivity extends Activity implements EasyPermissions.Per
             btnEnter.setEnabled(false);
         }
     }
-
+    private void initDatabase(){
+        Realm.init(this);
+        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
+                .deleteRealmIfMigrationNeeded()
+                .build();
+        Realm.setDefaultConfiguration(realmConfiguration);
+    }
 }
