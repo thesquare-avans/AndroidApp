@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
         surfaceView = (SurfaceView) findViewById(R.id.texture);
         permissionHandler = new PermissionHandler(this,this.getApplicationContext());
@@ -75,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         chatadapter = new chatListViewAdapter(this,getLayoutInflater(), (ArrayList<chatItem>) chat);
 
         listView.setAdapter(chatadapter);
+
         recorder.start();
     }
 

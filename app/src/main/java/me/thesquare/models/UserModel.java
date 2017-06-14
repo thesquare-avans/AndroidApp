@@ -12,7 +12,8 @@ public class UserModel extends RealmObject {
     @PrimaryKey
     @Required
     private String username;
-    private byte[] publicKey, privateKey;
+    private String publicKey, privateKey;
+  
     public UserModel() {
     }
 
@@ -23,20 +24,5 @@ public class UserModel extends RealmObject {
     public String getUsername() {
         return username;
     }
-
-    public void setPublicKey(byte[] publicKey) {
-        this.publicKey = publicKey;
-    }
-
-    public byte[] getPublicKey() {
-        return publicKey;
-    }
-
-    public void setPrivateKey(byte[] privateKey) {
-        this.privateKey = privateKey;
-    }
-
-    public byte[] getPrivateKey() {
-        return privateKey;
-    }
+  
 }
