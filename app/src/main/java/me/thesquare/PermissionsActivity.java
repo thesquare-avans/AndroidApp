@@ -1,37 +1,61 @@
 package me.thesquare;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.Manifest;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+
 import com.github.zagum.switchicon.SwitchIconView;
-import java.util.List;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequestErrorListener;
+import com.karumi.dexter.listener.single.CompositePermissionListener;
+import com.karumi.dexter.listener.single.DialogOnDeniedPermissionListener;
+import com.karumi.dexter.listener.single.PermissionListener;
+import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
-import pub.devrel.easypermissions.AppSettingsDialog;
-import pub.devrel.easypermissions.EasyPermissions;
 
 /**
  * Created by jensderond on 13/06/2017.
  */
 
-public class PermissionsActivity extends Activity implements EasyPermissions.PermissionCallbacks {
+public class PermissionsActivity extends Activity {
+    private ViewGroup rootView;
+
     private static final String TAG = "Permission Activity";
     private SwitchIconView cameraIconView, micIconView;
     private PermissionHandler permissionHandler;
+    private PermissionListener dialogOnDeniedPermissionListener;
+    private boolean micPerm = false, camPerm = false;
+    private PermissionListener cameraPermissionListener;
+    private PermissionListener microphonePermissionListener;
+    private PermissionRequestErrorListener errorListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initDatabase();
         setContentView(R.layout.activity_permissions);
+
+        rootView = (LinearLayout) findViewById(R.id.permLinLayout);
         cameraIconView = (SwitchIconView) findViewById(R.id.cameraIconView);
         micIconView = (SwitchIconView) findViewById(R.id.micIconView);
         final View cameraButton = findViewById(R.id.buttonCam);
         View micButton = findViewById(R.id.buttonMic);
-        permissionHandler = new PermissionHandler(this,this.getApplicationContext());
+
+        createPermissionListeners();
 
         boolean[] perms = permissionHandler.checkPermissions();
         setIcons(perms);
@@ -39,14 +63,44 @@ public class PermissionsActivity extends Activity implements EasyPermissions.Per
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                permissionHandler.cameraTask();
+                onCameraPermissionButtonClicked();
             }
         });
         micButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {permissionHandler.microphoneTask();
+            public void onClick(View v) {
+                onMicrophonePermissionButtonClicked();
             }
         });
+
+    }
+
+
+    private void createPermissionListeners(){
+
+        permissionHandler = new PermissionHandler(this,this.getApplicationContext());
+        dialogOnDeniedPermissionListener =
+                DialogOnDeniedPermissionListener.Builder.withContext(this)
+                        .withTitle("Record audio permission")
+                        .withMessage("Ik heb echt audio nodig man")
+                        .withButtonText(android.R.string.ok)
+                        .build();
+
+        microphonePermissionListener = new CompositePermissionListener(permissionHandler,
+                SnackbarOnDeniedPermissionListener.Builder.with(rootView,
+                        "All permissions are required for this application to function")
+                        .withOpenSettingsButton(R.string.permission_rationale_settings_button_text)
+                        .withCallback(new Snackbar.Callback() {
+                            @Override public void onShown(Snackbar snackbar) {
+                                super.onShown(snackbar);
+                            }
+
+                            @Override public void onDismissed(Snackbar snackbar, int event) {
+                                super.onDismissed(snackbar, event);
+                            }
+                        })
+                        .build());
+        cameraPermissionListener = new PermissionHandler(this, this.getApplicationContext());
 
     }
 
@@ -80,43 +134,87 @@ public class PermissionsActivity extends Activity implements EasyPermissions.Per
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
-            // Do something after user returned from app settings screen, like showing a Toast.
-            boolean[] perms = permissionHandler.checkPermissions();
-            setIcons(perms);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // Forward results to EasyPermissions
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
-    }
-
-    @Override
-    public void onPermissionsGranted(int requestCode, List<String> perms) {
-        Log.d("Permission", "onPermissionsGranted:" + requestCode + ":" + perms.size());
-        permissionHandler.checkPermissions();
-    }
-
-    @Override
-    public void onPermissionsDenied(int requestCode, List<String> perms) {
-        Log.d("Permission", "onPermissionsDenied:" + requestCode + ":" + perms.size());
-
-        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
-            new AppSettingsDialog.Builder(this).build().show();
-        }
-    }
-
     private void initDatabase(){
         Realm.init(this);
         RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
                 .deleteRealmIfMigrationNeeded()
                 .build();
         Realm.setDefaultConfiguration(realmConfiguration);
+    }
+
+    public void onCameraPermissionButtonClicked() {
+        new Thread(new Runnable() {
+            @Override public void run() {
+                Dexter.withActivity(PermissionsActivity.this)
+                        .withPermission(Manifest.permission.CAMERA)
+                        .withListener(cameraPermissionListener)
+                        .withErrorListener(errorListener)
+                        .onSameThread()
+                        .check();
+            }
+        }).start();
+    }
+
+    public void onMicrophonePermissionButtonClicked() {
+        new Thread(new Runnable() {
+            @Override public void run() {
+                Dexter.withActivity(PermissionsActivity.this)
+                        .withPermission(Manifest.permission.RECORD_AUDIO)
+                        .withListener(microphonePermissionListener)
+                        .withErrorListener(errorListener)
+                        .onSameThread()
+                        .check();
+            }
+        }).start();
+    }
+
+    public void showPermissionGranted(String permission) {
+        switch (permission) {
+            case Manifest.permission.CAMERA:
+                camPerm = true;
+                break;
+            case Manifest.permission.RECORD_AUDIO:
+                micPerm = true;
+                break;
+            default:
+                throw new RuntimeException("No feedback view for this permission");
+        }
+    }
+
+    public void showPermissionDenied(String permission, boolean isPermanentlyDenied) {
+        switch (permission) {
+            case Manifest.permission.CAMERA:
+                camPerm = false;
+                break;
+            case Manifest.permission.RECORD_AUDIO:
+                micPerm = false;
+                break;
+            default:
+                throw new RuntimeException("No feedback view for this permission");
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public void showPermissionRationale(final PermissionToken token) {
+        new AlertDialog.Builder(this).setTitle(R.string.permission_rationale_title)
+                .setMessage(R.string.permission_rationale_message)
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        token.cancelPermissionRequest();
+                    }
+                })
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        token.continuePermissionRequest();
+                    }
+                })
+                .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override public void onDismiss(DialogInterface dialog) {
+                        token.cancelPermissionRequest();
+                    }
+                })
+                .show();
     }
 }

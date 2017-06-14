@@ -22,16 +22,16 @@ public class LoginActivity extends AppCompatActivity {
     private EditText txtUsername;
     private KeyManager keyManager;
     private SharedPreferences sharedPref;
+    private PermissionHandler permissionHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        realm = Realm.getDefaultInstance();
+        permissionHandler = new PermissionHandler(this,this.getApplicationContext());
+        checkPermissions();
+
         sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-
-
-
         txtUsername = (EditText) findViewById(R.id.editText);
         btnLogin = (Button) findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(new View.OnClickListener(){
@@ -47,7 +47,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        showUsers();
+        checkPermissions();
     }
 
     private boolean checkUsername(){
@@ -96,5 +96,22 @@ public class LoginActivity extends AppCompatActivity {
         RealmResults<UserModel> result = realm.where(UserModel.class).findAll();
 
         result.deleteAllFromRealm();
+    }
+
+    private void checkPermissions(){
+        boolean[] perms = permissionHandler.checkPermissions();
+        if (! perms[0] && ! perms[1] ){
+            permissionHandler.sendToPermissionsActivity(this, PermissionsActivity.class);
+        }
+        else {
+            try {
+                realm = Realm.getDefaultInstance();
+                showUsers();
+            }
+            catch (IllegalStateException e){
+                e.printStackTrace();
+            }
+
+        }
     }
 }
