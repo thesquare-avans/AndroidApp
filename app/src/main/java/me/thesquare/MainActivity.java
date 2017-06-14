@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private List<chatItem> chat = new ArrayList<>();
     private chatListViewAdapter chatadapter;
     private static final String TAG = "MainActivity";
+    private PermissionHandler permissionHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
         TextureView textview = (TextureView) findViewById(R.id.texture);
 
 
+        permissionHandler = new PermissionHandler(this,this.getApplicationContext());
+
         try {
             recorder = new Recorder(textview, fsdClient);
         }
@@ -73,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         chatadapter = new chatListViewAdapter(this,getLayoutInflater(), (ArrayList<chatItem>) chat);
 
         listView.setAdapter(chatadapter);
+
         recorder.start();
     }
 
@@ -86,8 +90,16 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onResume(){
         super.onResume();
-
+        checkPermissions();
     }
+
+    private void checkPermissions(){
+        boolean[] perms = permissionHandler.checkPermissions();
+        if (! perms[0] && ! perms[1] ){
+            permissionHandler.sendToPermissionsActivity(this, PermissionsActivity.class);
+        }
+    }
+
     public void AddChat(View view){
 
         chatItem addChat = new chatItem();
