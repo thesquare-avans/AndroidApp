@@ -1,16 +1,18 @@
 package me.thesquare;
 
+
+import android.graphics.SurfaceTexture;
 import android.media.MediaRecorder;
+import android.os.Handler;
+import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.TextureView;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.io.Writer;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import static java.lang.Thread.sleep;
 
@@ -18,30 +20,31 @@ import static java.lang.Thread.sleep;
  * Created by larsh on 13-6-2017.
  */
 
-public class Recorder extends TimerTask implements Runnable {
-    private static final int CAPTURE_TIME = 3000;
-
+public class Recorder implements Runnable {
+    private static final int CAPTURE_TIME = 5000;
     private MediaRecorder mediaRecorder;
-    private SurfaceView cameraPreview;
+    private TextureView cameraPreview;
     private FragmentWriter writer;
     private File tmpFile;
     private RandomAccessFile outputFile;
-    private Timer captureTimer;
+    private Handler captureHandler;
 
-    private Object isRecordingMut;
+    private static final Object isRecordingMut = new Object();
     private boolean isRecording;
 
-    public Recorder(SurfaceView cameraPreview, FragmentWriter writer) throws IOException {
+    public Recorder(TextureView cameraPreview, FragmentWriter writer) throws IOException {
         this.cameraPreview = cameraPreview;
         this.writer = writer;
         this.mediaRecorder = new MediaRecorder();
-        this.captureTimer = new Timer();
-        this.tmpFile = File.createTempFile("the_square_tmp_video", ".mp4");
+        this.captureHandler = new Handler();
+        this.tmpFile = File.createTempFile("the_square_tmp_video", ".tmp");
         this.outputFile = new RandomAccessFile(tmpFile, "rw");
+
         this.initMediaRecorder();
     }
 
     private void initMediaRecorder() throws IOException {
+
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
@@ -50,7 +53,6 @@ public class Recorder extends TimerTask implements Runnable {
         mediaRecorder.setAudioEncodingBitRate(128);
         mediaRecorder.setVideoFrameRate(25);
         mediaRecorder.setVideoSize(640, 480);
-        mediaRecorder.setPreviewDisplay(this.cameraPreview.getHolder().getSurface());
         mediaRecorder.setOutputFile(outputFile.getFD());
         mediaRecorder.prepare();
     }
@@ -64,7 +66,7 @@ public class Recorder extends TimerTask implements Runnable {
         synchronized (isRecordingMut) {
             isRecording = true;
         }
-        captureTimer.schedule(this, 0);
+        captureHandler.post(this);
     }
 
     public void stop() {
@@ -76,12 +78,16 @@ public class Recorder extends TimerTask implements Runnable {
     @Override
     public void run() {
         try {
+            Log.i("Recorder", "Start capture");
             mediaRecorder.start();
             sleep(CAPTURE_TIME);
             mediaRecorder.stop();
+            Log.i("Recorder", "Stop capture");
 
             byte[] buffer = new byte[(int) outputFile.length()];
-            outputFile.readFully(buffer);
+            Log.i("Recorder", "outputFile length: " + outputFile.length());
+            outputFile.seek(0);
+            outputFile.read(buffer);
             writer.writeFragment(buffer);
             outputFile.setLength(0);
 
@@ -89,7 +95,7 @@ public class Recorder extends TimerTask implements Runnable {
                 if (isRecording) {
                     mediaRecorder.reset();
                     initMediaRecorder();
-                    captureTimer.schedule(this, 0);
+                    captureHandler.post(this);
                 }
             }
         } catch (Exception e) {
