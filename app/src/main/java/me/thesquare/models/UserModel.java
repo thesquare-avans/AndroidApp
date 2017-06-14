@@ -11,31 +11,32 @@ import io.realm.annotations.Required;
 public class UserModel extends RealmObject {
     @PrimaryKey
     @Required
-    private String username, publicKey, privateKey;
+    private String username;
+    private byte[] publicKey, privateKey;
     public UserModel() {
-    }
-
-    public String getPublicKey() {
-        return publicKey;
-    }
-
-    public void setPublicKey(String publicKey) {
-        this.publicKey = publicKey;
-    }
-
-    public String getUsername() {
-        return username;
     }
 
     public void setUsername(String username) {
         this.username = username;
     }
 
-    public String getPrivateKey() {
-        return privateKey;
+    public String getUsername() {
+        return username;
     }
 
-    public void setPrivateKey(String privateKey) {
+    public void setPublicKey(byte[] publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public byte[] getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPrivateKey(byte[] privateKey) {
         this.privateKey = privateKey;
+    }
+
+    public byte[] getPrivateKey() {
+        return privateKey;
     }
 }

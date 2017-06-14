@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import com.github.zagum.switchicon.SwitchIconView;
 import java.util.List;
 
@@ -76,7 +75,7 @@ public class PermissionsActivity extends Activity implements EasyPermissions.Per
             cameraIconView.setIconEnabled(false, true);
         }
         if ( perms[0] && perms[1] ){
-            Intent i = new Intent(this, MainActivity.class);
+            Intent i = new Intent(this, LoginActivity.class);
             startActivity(i);
         }
     }

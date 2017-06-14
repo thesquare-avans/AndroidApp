@@ -11,16 +11,39 @@ import java.security.NoSuchAlgorithmException;
 public class KeyManager {
     private KeyPairGenerator kpg;
     private KeyPair pair;
+    private byte[] privateKey;
+    private byte[] publicKey;
+
     // genereren en verifieren keys
 
-    public byte[] generateKey() throws NoSuchAlgorithmException {
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-        kpg.initialize(2048);
-        pair = kpg.generateKeyPair();
-        byte[] pri = pair.getPrivate().getEncoded();
-        byte[] pub = pair.getPublic().getEncoded();
+    public void generateKey() {
+        try {
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+            kpg.initialize(2048);
+            pair = kpg.generateKeyPair();
 
-        return pub;
+            setPrivateKey( pair.getPrivate().getEncoded() );
+            setPublicKey( pair.getPublic().getEncoded() );
+        }
+        catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public byte[] getPrivateKey(){
+        return privateKey;
+    }
+
+    private void setPrivateKey(byte[] privateKey) {
+        this.privateKey = privateKey;
+    }
+
+    public byte[] getPublicKey() {
+        return publicKey;
+    }
+
+    private void setPublicKey(byte[] publicKey) {
+        this.publicKey = publicKey;
     }
 }
 
