@@ -8,6 +8,9 @@ import android.view.View;
 import android.widget.Button;
 import com.github.zagum.switchicon.SwitchIconView;
 import java.util.List;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -23,7 +26,7 @@ public class PermissionsActivity extends Activity implements EasyPermissions.Per
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        initDatabase();
         setContentView(R.layout.activity_permissions);
         cameraIconView = (SwitchIconView) findViewById(R.id.cameraIconView);
         micIconView = (SwitchIconView) findViewById(R.id.micIconView);
@@ -109,5 +112,50 @@ public class PermissionsActivity extends Activity implements EasyPermissions.Per
             new AppSettingsDialog.Builder(this).build().show();
         }
     }
+  
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
+        if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
+            // Do something after user returned from app settings screen, like showing a Toast.
+            checkPermissions();
+        }
+    }
+
+    public void checkPermissions(){
+        if (EasyPermissions.hasPermissions(this, Manifest.permission.RECORD_AUDIO)) {
+            // Have the Microphone permission, do the thing!
+            micIconView.setIconEnabled(true,true);
+            micPerm = true;
+        }
+        if (!EasyPermissions.hasPermissions(this, Manifest.permission.RECORD_AUDIO)) {
+            // No Microphone permission!
+            micIconView.setIconEnabled(false,true);
+            micPerm = false;
+        }
+        if (EasyPermissions.hasPermissions(this, Manifest.permission.CAMERA)) {
+            // Have the Camera permission, do the thing!
+            cameraIconView.setIconEnabled(true,true);
+            camPerm = true;
+        }
+        if (!EasyPermissions.hasPermissions(this, Manifest.permission.CAMERA)) {
+            // No Camera permission!
+            cameraIconView.setIconEnabled(false,true);
+            camPerm = false;
+        }
+        if (micPerm && camPerm){
+            btnEnter.setEnabled(true);
+        }
+        else {
+            btnEnter.setEnabled(false);
+        }
+    }
+    private void initDatabase(){
+        Realm.init(this);
+        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
+                .deleteRealmIfMigrationNeeded()
+                .build();
+        Realm.setDefaultConfiguration(realmConfiguration);
+    }
 }
