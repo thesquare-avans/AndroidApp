@@ -30,7 +30,7 @@ public class LoginActivity extends AppCompatActivity {
         realm = Realm.getDefaultInstance();
         sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
 
-        removeAllUsers();
+
 
         txtUsername = (EditText) findViewById(R.id.editText);
         btnLogin = (Button) findViewById(R.id.btnLogin);
@@ -62,7 +62,6 @@ public class LoginActivity extends AppCompatActivity {
             UserModel user = new UserModel();
             user.setUsername( txtUsername.getText().toString() );
             user.setPrivateKey( keyManager.getPrivateKey() );
-            user.setPublicKey( keyManager.getPublicKey() );
 
             /*
               transaction to the database to update a player
@@ -86,9 +85,9 @@ public class LoginActivity extends AppCompatActivity {
 
         if ( result != null && result.size() > 0) {
             for (int i = 0; i < result.size(); i++) {
-                Log.d("Player name", result.get(i).getUsername());
-                Log.d("Public key", result.get(i).getPublicKey().toString());
-                Log.d("Private key", result.get(i).getPrivateKey().toString());
+                Log.d( "Player name", result.get(i).getUsername() );
+                Log.d( "Public key", result.get(i).getPublicKey().toString() );
+                Log.d( "Private key", result.get(i).getPrivateKey().toString() );
             }
         }
     }

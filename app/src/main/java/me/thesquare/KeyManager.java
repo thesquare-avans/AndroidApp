@@ -36,8 +36,8 @@ public class KeyManager {
     private static String statickey = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF6NVViUDlwQ2d6QnNxU0NyT2o2NwpDaHZtSEVyNWN4QnJYQTR2QTdJOUVWdlNubWFzSVpHdUFSRDRnSlN4SWVYNTdrd0tVUmluUXEwZHhHc01Ld3FkCjBScEY1Q0pYcTlrNGQ3MTNwZEcwcEs2TUk1MklyNzhKQ3QwRHpDR2Z6OVRwZjIwQlV5TFRkREtqVkdURkpCUDUKaW1YR21wZ3Q3RVRlZ0VYVEVCZzRnSjl3czF0cEFiMjFobExUc28yVWt5UjdzNzVhQTBSUUZZcHcvY2FBM0RlRApKdm5YemExRnd5MTF0dVBNTy84SCtjV2htWEtTSTBXQjFGWFFUbnphRm9YRjVOUU1LQ1VrMCt6UUxFSC9BL2VaCk5yS3pna09YVk5NZjlWbzEvRzBaT1d2Ync0bkhRUko4akF1QXJJclgvYkxGeG9qcEpRRXVCVy9oby9JOFIxZmIKN1FJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==";
     private static Signature sig;
     private ResponseModel response;
-    private String privateKey;
-    private String publicKey;
+    private byte[] privateKey;
+    private byte[] publicKey;
 
     // genereren en verifieren keys
 
@@ -55,11 +55,11 @@ public class KeyManager {
         }
     }
 
-    public byte[] getPrivateKey(){
+    public byte[] getPrivateKey() {
         return privateKey;
     }
 
-    private void setPrivateKey(byte[] privateKey) {
+    public void setPrivateKey(byte[] privateKey) {
         this.privateKey = privateKey;
     }
 
@@ -67,7 +67,7 @@ public class KeyManager {
         return publicKey;
     }
 
-    private void setPublicKey(byte[] publicKey) {
+    public void setPublicKey(byte[] publicKey) {
         this.publicKey = publicKey;
     }
 
@@ -123,11 +123,11 @@ public class KeyManager {
     }
 
     public static String signMessage(String message) {
-        MessageModel data = new MessageModel(message, Base64.encodeToString(user.getPublicKey().getBytes(), Base64.DEFAULT));
+        MessageModel data = new MessageModel(message, Base64.encodeToString(user.getPublicKey(), Base64.DEFAULT));
 
         try {
             sig = Signature.getInstance("SHA256withRSA");
-            sig.initSign(getPrivateKey(user.getPrivateKey()));
+            sig.initSign(getPrivateKey(user.getPrivateKey().toString()));
             return String.valueOf(sig.sign(gson.toJson(data, MessageModel.class).getBytes(), 0, 0));
         } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
             e.printStackTrace();

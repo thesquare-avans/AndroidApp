@@ -55,7 +55,7 @@ public class ApiHandler {
 
     public Map<String, String> getHeaders() throws AuthFailureError {
         Map<String, String>  params = new HashMap<String, String>();
-        params.put("X-PublicKey", user.getPublicKey());
+        params.put("X-PublicKey", user.getPublicKey().toString());
         params.put("Content-Type", "application/json; charset=utf-8");
 
         return params;
