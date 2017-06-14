@@ -1,18 +1,13 @@
 package me.thesquare;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
-
 import com.github.zagum.switchicon.SwitchIconView;
-
 import java.util.List;
-
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -24,11 +19,9 @@ import pub.devrel.easypermissions.EasyPermissions;
  */
 
 public class PermissionsActivity extends Activity implements EasyPermissions.PermissionCallbacks {
-    private static final int RC_CAMERA_PERM = 111;
-    private static final int RC_MIC_PERM = 112;
+    private static final String TAG = "Permission Activity";
     private SwitchIconView cameraIconView, micIconView;
-    private Button btnEnter;
-    private boolean micPerm = false, camPerm = false;
+    private PermissionHandler permissionHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,79 +31,77 @@ public class PermissionsActivity extends Activity implements EasyPermissions.Per
         cameraIconView = (SwitchIconView) findViewById(R.id.cameraIconView);
         micIconView = (SwitchIconView) findViewById(R.id.micIconView);
         final View cameraButton = findViewById(R.id.buttonCam);
-        btnEnter = (Button) findViewById(R.id.btnEnter);
         View micButton = findViewById(R.id.buttonMic);
-        checkPermissions();
+        permissionHandler = new PermissionHandler(this,this.getApplicationContext());
+
+        boolean[] perms = permissionHandler.checkPermissions();
+        setIcons(perms);
 
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cameraTask();
+                permissionHandler.cameraTask();
             }
         });
         micButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                microphoneTask();
+            public void onClick(View v) {permissionHandler.microphoneTask();
             }
         });
 
-        btnEnter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(view.getContext(),MainActivity.class);
-                startActivityForResult(i,0);
-
-            }
-        });
     }
-
 
     @Override
     protected void onResume() {
         super.onResume();
-        checkPermissions();
+        boolean[] perms = permissionHandler.checkPermissions();
+        setIcons(perms);
+    }
+
+    private void setIcons(boolean[] perms){
+        if ( perms[0] ) {
+            Log.d(TAG, "Microphone permission granted");
+            micIconView.setIconEnabled(true, true);
+        }
+        else {
+            Log.d(TAG, "Microphone permission not granted");
+            micIconView.setIconEnabled(false, true);
+        }
+        if ( perms[1] ) {
+            Log.d(TAG, "Camera permission granted");
+            cameraIconView.setIconEnabled(true, true);
+        }
+        else {
+            Log.d(TAG, "Camera permission not granted");
+            cameraIconView.setIconEnabled(false, true);
+        }
+        if ( perms[0] && perms[1] ){
+            Intent i = new Intent(this, MainActivity.class);
+            startActivity(i);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
+            // Do something after user returned from app settings screen, like showing a Toast.
+            boolean[] perms = permissionHandler.checkPermissions();
+            setIcons(perms);
+        }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
         // Forward results to EasyPermissions
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
-    }
-
-    @AfterPermissionGranted(RC_CAMERA_PERM)
-    public void cameraTask() {
-        if (EasyPermissions.hasPermissions(this, Manifest.permission.CAMERA)) {
-            cameraIconView.setIconEnabled(true,true);
-            // Have permission, do the thing!
-            Toast.makeText(this, "We already have the camera permission", Toast.LENGTH_LONG).show();
-
-        } else {
-            // Ask for one permission
-            EasyPermissions.requestPermissions(this, getString(R.string.permission_text_cam),
-                    RC_CAMERA_PERM, Manifest.permission_group.CAMERA);
-        }
-    }
-
-    @AfterPermissionGranted(RC_MIC_PERM)
-    public void microphoneTask() {
-        if (EasyPermissions.hasPermissions(this, Manifest.permission.RECORD_AUDIO)) {
-            // Have permission, do the thing!
-            micIconView.setIconEnabled(true,true);
-            Toast.makeText(this, "We already have the microphone permission", Toast.LENGTH_LONG).show();
-        } else {
-            // Ask for one permission
-            EasyPermissions.requestPermissions(this, getString(R.string.permission_text_mic),
-                    RC_MIC_PERM, Manifest.permission_group.MICROPHONE);
-        }
     }
 
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
         Log.d("Permission", "onPermissionsGranted:" + requestCode + ":" + perms.size());
-        checkPermissions();
+        permissionHandler.checkPermissions();
     }
 
     @Override
@@ -121,7 +112,7 @@ public class PermissionsActivity extends Activity implements EasyPermissions.Per
             new AppSettingsDialog.Builder(this).build().show();
         }
     }
-
+  
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
