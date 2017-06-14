@@ -81,6 +81,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void showUsers(){
+        realm = Realm.getDefaultInstance();
         RealmResults<UserModel> result = realm.where(UserModel.class).findAll();
 
         if ( result != null && result.size() > 0) {
@@ -100,18 +101,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private void checkPermissions(){
         boolean[] perms = permissionHandler.checkPermissions();
-        if (! perms[0] && ! perms[1] ){
+        if (! perms[0] || ! perms[1] ){
             permissionHandler.sendToPermissionsActivity(this, PermissionsActivity.class);
-        }
-        else {
-            try {
-                realm = Realm.getDefaultInstance();
-                showUsers();
-            }
-            catch (IllegalStateException e){
-                e.printStackTrace();
-            }
-
         }
     }
 }

@@ -79,12 +79,6 @@ public class PermissionsActivity extends Activity {
     private void createPermissionListeners(){
 
         permissionHandler = new PermissionHandler(this,this.getApplicationContext());
-        dialogOnDeniedPermissionListener =
-                DialogOnDeniedPermissionListener.Builder.withContext(this)
-                        .withTitle("Record audio permission")
-                        .withMessage("Ik heb echt audio nodig man")
-                        .withButtonText(android.R.string.ok)
-                        .build();
 
         microphonePermissionListener = new CompositePermissionListener(permissionHandler,
                 SnackbarOnDeniedPermissionListener.Builder.with(rootView,
@@ -100,7 +94,20 @@ public class PermissionsActivity extends Activity {
                             }
                         })
                         .build());
-        cameraPermissionListener = new PermissionHandler(this, this.getApplicationContext());
+        cameraPermissionListener = new CompositePermissionListener(permissionHandler,
+                SnackbarOnDeniedPermissionListener.Builder.with(rootView,
+                        "All permissions are required for this application to function")
+                        .withOpenSettingsButton(R.string.permission_rationale_settings_button_text)
+                        .withCallback(new Snackbar.Callback() {
+                            @Override public void onShown(Snackbar snackbar) {
+                                super.onShown(snackbar);
+                            }
+
+                            @Override public void onDismissed(Snackbar snackbar, int event) {
+                                super.onDismissed(snackbar, event);
+                            }
+                        })
+                        .build());
 
     }
 

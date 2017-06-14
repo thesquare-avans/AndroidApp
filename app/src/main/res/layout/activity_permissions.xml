@@ -4,14 +4,17 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:id="@+id/permLinLayout"
+    android:weightSum="1"
     android:layout_height="match_parent"
     android:background="#333333">
 
     <ImageView
+        android:id="@+id/imageView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:src="@drawable/square_logo" />
+        android:layout_marginTop="30dp"
+        android:layout_weight="0.15"
+        app:srcCompat="@drawable/square_logo" />
 
     <TextView
         android:layout_width="match_parent"
@@ -19,6 +22,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
+        android:layout_weight="0.05"
         android:text="@string/request_permissions"
         android:textAlignment="center"
         android:textSize="16sp" />
@@ -26,9 +30,10 @@
     <LinearLayout
         android:id="@+id/buttonCam"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="0dp"
+        android:layout_height="00dp"
         android:gravity="center"
+        android:layout_weight="0.27"
         android:orientation="vertical">
         <com.github.zagum.switchicon.SwitchIconView
             android:layout_width="wrap_content"
@@ -51,8 +56,9 @@
     <LinearLayout
         android:id="@+id/buttonMic"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_marginTop="32dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_weight="0.27"
         android:gravity="center"
         android:orientation="vertical">
         <com.github.zagum.switchicon.SwitchIconView
