@@ -12,27 +12,46 @@ import android.view.TextureView;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.List;
+import static java.lang.Thread.sleep;
 
 /**
  * Created by jensderond on 12/06/2017.
  */
 
-public class Record {
+public class Record implements Runnable {
+    private static final int CAPTURE_TIME = 5000;
     private android.hardware.Camera mCamera;
     private TextureView mPreview;
     private MediaRecorder mMediaRecorder;
     private File mOutputFile;
-    private boolean isRecording;
     private static final String TAG = "Record class";
     private String filename;
     private Activity activity;
+    private Thread captureThread;
+    private FragmentWriter writer;
+    private File tmpFile;
+    private RandomAccessFile outputFile;
+
+    private static final Object isRecordingMut = new Object();
+    private boolean isRecording;
 
 
     public Record(Activity activity, TextureView view){
         this.activity = activity;
         this.mPreview = view;
     }
+
+
+    public Record(TextureView cameraPreview, FragmentWriter writer) throws IOException {
+        this.mPreview = cameraPreview;
+        this.writer = writer;
+        this.mMediaRecorder = new MediaRecorder();
+        this.tmpFile = File.createTempFile("the_square_tmp_video", ".tmp");
+        this.outputFile = new RandomAccessFile(tmpFile, "rw");
+    }
+
     public void releaseMediaRecorder(){
         if (mMediaRecorder != null) {
             // clear recorder configuration
@@ -57,6 +76,8 @@ public class Record {
     public void Capture(){
         try {
             mMediaRecorder.stop();  // stop the recording
+            Log.d(TAG, mOutputFile.getPath() );
+            Log.d(TAG, mOutputFile.length() + "");
         } catch (RuntimeException e) {
             mOutputFile.delete();
         }
@@ -67,9 +88,9 @@ public class Record {
         isRecording = false;
         this.releaseCamera();
     }
-    public  void prepareTask(){
-        new MediaPrepareTask().execute(null, null, null);
-    }
+//    public  void prepareTask(){
+//        new MediaPrepareTask().execute(null, null, null);
+//    }
 
     public void removeTempFiles(){
         File dir = new File(Environment.getExternalStorageDirectory()+"/theSquare/");
@@ -147,7 +168,11 @@ public class Record {
 
         Log.d(TAG, filename);
 
-        mMediaRecorder.setOutputFile(Environment.getExternalStorageDirectory().getPath() + "/theSquare/" + filename +".mp4");
+        try {
+            mMediaRecorder.setOutputFile(outputFile.getFD());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Log.d(TAG, Environment.getExternalStorageDirectory().getPath());
         // END_INCLUDE (configure_media_recorder)
 
@@ -174,30 +199,82 @@ public class Record {
         this.filename = filename;
     }
 
-    class MediaPrepareTask extends AsyncTask<Void, Void, Boolean> {
+//    class MediaPrepareTask extends AsyncTask<Void, Void, Boolean> {
+//
+//        @Override
+//        protected Boolean doInBackground(Void... voids) {
+//            // initialize video camera
+//            if (prepareVideoRecorder()) {
+//                // Camera is available and unlocked, MediaRecorder is prepared,
+//                // now you can start recording
+//                mMediaRecorder.start();
+//
+//                isRecording = true;
+//            } else {
+//                // prepare didn't work, release the camera
+//                releaseMediaRecorder();
+//                return false;
+//            }
+//            return true;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Boolean result) {
+//            if (!result) {
+//                activity.finish();
+//            }
+//        }
+//    }
 
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            // initialize video camera
-            if (prepareVideoRecorder()) {
-                // Camera is available and unlocked, MediaRecorder is prepared,
-                // now you can start recording
-                mMediaRecorder.start();
 
-                isRecording = true;
-            } else {
-                // prepare didn't work, release the camera
-                releaseMediaRecorder();
-                return false;
-            }
-            return true;
+    public void start() {
+
+        synchronized (isRecordingMut) {
+            isRecording = true;
         }
+        this.captureThread = new Thread(this);
+        this.captureThread.start();
+    }
 
-        @Override
-        protected void onPostExecute(Boolean result) {
-            if (!result) {
-                activity.finish();
+    public void stop() throws InterruptedException {
+        synchronized (isRecordingMut) {
+            isRecording = false;
+        }
+        this.captureThread.join();
+    }
+
+    @Override
+    public void run() {
+        try {
+            for (;;) {
+                prepareVideoRecorder();
+                Log.i("Recorder", "Start capture");
+                mMediaRecorder.start();
+                sleep(CAPTURE_TIME);
+
+                mMediaRecorder.stop();
+
+                Log.i("Recorder", "Stop capture");
+
+                byte[] buffer = new byte[(int) outputFile.length()];
+                Log.i("Recorder", "outputFile length: " + outputFile.length());
+                outputFile.seek(0);
+                outputFile.read(buffer);
+                writer.writeFragment(buffer);
+                outputFile.setLength(0);
+
+
+
+                synchronized (isRecordingMut) {
+                    if (!isRecording) {
+                        break;
+                    }
+                }
+
             }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

@@ -4,6 +4,7 @@ import android.content.pm.ActivityInfo;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.TextureView;
@@ -12,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,39 +23,38 @@ public class MainActivity extends AppCompatActivity {
     private Camera cam;
     private Record record;
     private int fileCount;
+    private FSDClient fsdClient;
     private static final String TAG = "AndroidCameraApi";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectNetwork() // or .detectAll() for all detectable problems
+                .penaltyDialog()  //show a dialog
+                .permitNetwork() //permit Network access
+                .build());
         setContentView(R.layout.activity_main);
         textureView = (TextureView) findViewById(R.id.texture);
 
 
         assert textureView != null;
 
-        record = new Record(this, textureView);
+        Socket serverConnection;
+
+        try {
+            serverConnection = new Socket("192.168.0.105",1312);
+            fsdClient = new FSDClient(null, serverConnection.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        record = new Record(this, textureView);
         fileCount = 1;
         ImageButton btn2 = (ImageButton)findViewById(R.id.btnSwitch);
         //set items
         List<chatItem> test = new ArrayList<>();
         chatItem c = new chatItem();
-        c.chatname = "lars1337";
-        c.chattext = "Hallo, ik ben een Larsson!";
-        chatItem chat2 = new chatItem();
-        chat2.chatname = "TheRubenGames";
-        chat2.chattext = "Play the 2 mana card kappa :Omegalul:";
-        chatItem chat3 = new chatItem();
-        chat3.chatname = "CliffordLovesChicks";
-        chat3.chattext = "Show boobs please!";
-        chatItem chat4 = new chatItem();
-        chat4.chatname = "AntonTestoBom";
-        chat4.chattext = "Even een boterhammetje eten! #pindakaas";
-        test.add(c);
-        test.add(chat2);
-        test.add(chat3);
-        test.add(chat4);
         // end items
         ListView listView = (ListView) findViewById(R.id.lvChat);
         chatListViewAdapter adapter = new chatListViewAdapter(this,getLayoutInflater(), (ArrayList<chatItem>) test);
@@ -62,7 +63,11 @@ public class MainActivity extends AppCompatActivity {
 
 //        cam = new Camera(textureView, btn2, this, MainActivity.this);
 
-
+        try {
+            record = new Record(textureView, fsdClient);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -75,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
             fileCount++;
         } else {
             record.setFilename(String.valueOf(fileCount));
-            record.prepareTask();
+            record.start();
         }
     }
 
@@ -88,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         record.releaseMediaRecorder();
         // release the camera immediately on pause event
         record.releaseCamera();
-        record.removeTempFiles();
+//        record.removeTempFiles();
     }
 
     protected void onResume(){
