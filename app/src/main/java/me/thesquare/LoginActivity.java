@@ -1,6 +1,7 @@
 package me.thesquare;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ public class LoginActivity extends AppCompatActivity {
     private KeyManager keyManager;
     private SharedPreferences sharedPref;
     private PermissionHandler permissionHandler;
+    private ApiHandler apihandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,8 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if ( checkUsername() ){
                     addUser( txtUsername.getText().toString() );
+                    Intent i = new Intent(getApplicationContext(),MainActivity.class);
+                    startActivity(i);
                 }
             }
         });
@@ -55,13 +59,19 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void addUser(String username){
+        realm = Realm.getDefaultInstance();
         RealmResults<UserModel> result = realm.where( UserModel.class ).equalTo( "username", txtUsername.getText().toString() ).findAll();
         if ( result.isEmpty() && !username.equals("") ) {
             keyManager = new KeyManager();
             keyManager.generateKey();
             UserModel user = new UserModel();
             user.setUsername( txtUsername.getText().toString() );
-            user.setPrivateKey( keyManager.getPrivateKey() );
+            user.setPrivateKey( keyManager.getPrivateKey().getEncoded());
+            user.setPublicKey(keyManager.getPublicKey().getEncoded());
+            keyManager.setUser(user);
+            apihandler = new ApiHandler(keyManager);
+            apihandler.register(txtUsername.getText().toString(), this);
+            apihandler.authenticate(txtUsername.getText().toString(), keyManager.getPublicKey().toString());
 
             /*
               transaction to the database to update a player
