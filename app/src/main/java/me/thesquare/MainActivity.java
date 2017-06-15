@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
     private FSDClient fsdClient;
     private ListView listView;
     private ApiHandler apiHandler;
-    private Camera cam;
     private List<chatItem> chat = new ArrayList<>();
     private chatListViewAdapter chatadapter;
     private static final String TAG = "MainActivity";
@@ -70,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         ImageButton btn2 = (ImageButton)findViewById(R.id.btnSwitch);
-        cam = new Camera(textview, btn2, this, MainActivity.this);
         chatinput = (EditText)findViewById(R.id.chatinput);
         listView = (ListView) findViewById(R.id.lvChat);
         chatadapter = new chatListViewAdapter(this,getLayoutInflater(), (ArrayList<chatItem>) chat);
