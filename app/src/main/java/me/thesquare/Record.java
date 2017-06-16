@@ -20,13 +20,14 @@ import static java.lang.Thread.sleep;
  * Created by jensderond on 12/06/2017.
  */
 
-public class Recorder implements Runnable {
-    private static final String TAG = "Record class";
+public class Record implements Runnable {
     private static final int CAPTURE_TIME = 5000;
-
-    private Camera mCamera;
+    private android.hardware.Camera mCamera;
     private TextureView mPreview;
     private MediaRecorder mMediaRecorder;
+    private File mOutputFile;
+    private static final String TAG = "Record class";
+    private String filename;
     private Thread captureThread;
     private FragmentWriter writer;
     private File tmpFile;
@@ -35,7 +36,8 @@ public class Recorder implements Runnable {
     private static final Object isRecordingMut = new Object();
     private boolean isRecording;
 
-    public Recorder(TextureView cameraPreview, FragmentWriter writer) throws IOException {
+
+    public Record(TextureView cameraPreview, FragmentWriter writer) throws IOException {
         this.mPreview = cameraPreview;
         this.writer = writer;
         this.mMediaRecorder = new MediaRecorder();
@@ -64,11 +66,25 @@ public class Recorder implements Runnable {
         }
     }
 
+    public void Capture(){
+        try {
+            mMediaRecorder.stop();  // stop the recording
+            Log.d(TAG, mOutputFile.getPath() );
+            Log.d(TAG, mOutputFile.length() + "");
+        } catch (RuntimeException e) {
+            mOutputFile.delete();
+        }
+        releaseMediaRecorder(); // release the MediaRecorder object
+        mCamera.lock();         // take camera access back from MediaRecorder
+
+        // inform the user that recording has stopped
+        isRecording = false;
+        this.releaseCamera();
+    }
 
     public boolean prepareVideoRecorder(){
 
         // BEGIN_INCLUDE (configure_preview)
-        Log.d(TAG, "Start preparing");
         mCamera = CameraHelper.getDefaultCameraInstance();
 
         // We need to make sure that our preview and recording video size are supported by the
@@ -116,16 +132,23 @@ public class Recorder implements Runnable {
         // Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
         mMediaRecorder.setProfile(profile);
         mMediaRecorder.setOrientationHint(90);
-//
-//        // Step 4: Set output file
-//        mOutputFile = CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO);
-//        if (mOutputFile == null) {
-//            return false;
-//        }
-//        Log.d(TAG, mOutputFile.getPath());
+
+        // Step 4: Set output file
+        mOutputFile = CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO);
+        if (mOutputFile == null) {
+            return false;
+        }
+        Log.d(TAG, mOutputFile.getPath());
+        File file = new File(Environment.getExternalStorageDirectory().getPath() + "/theSquare/");
+        if(!file.exists()){
+            file.mkdirs();
+        }
+
+        Log.d(TAG, filename);
 
         try {
             mMediaRecorder.setOutputFile(outputFile.getFD());
+            Log.d(TAG, outputFile.getFD().toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -147,10 +170,9 @@ public class Recorder implements Runnable {
     }
 
     public boolean getRecordingState(){
-        synchronized (isRecordingMut) {
-            return isRecording;
-        }
+        return isRecording;
     }
+
 
     public void start() {
 
@@ -188,14 +210,19 @@ public class Recorder implements Runnable {
                 writer.writeFragment(buffer);
                 outputFile.setLength(0);
 
+
                 synchronized (isRecordingMut) {
                     if (!isRecording) {
                         break;
                     }
                 }
+
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
 }

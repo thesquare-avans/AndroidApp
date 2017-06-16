@@ -41,8 +41,15 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if ( checkUsername() ){
                     addUser( txtUsername.getText().toString() );
-                    Intent i = new Intent(getApplicationContext(),MainActivity.class);
+                    Intent i = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(i);
+                }
+                else{
+                    Context context = getApplicationContext();
+                    CharSequence text = "Please fill in the login field.";
+                    int duration = Toast.LENGTH_SHORT;
+                    Toast toast =  Toast.makeText(context,text,duration);
+                    toast.show();
                 }
             }
         });
