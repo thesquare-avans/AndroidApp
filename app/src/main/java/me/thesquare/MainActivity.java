@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -113,16 +114,20 @@ public class MainActivity extends AppCompatActivity {
     public void AddChat(View view){
 
         chatItem addChat = new chatItem();
-        username = "Testuser";
         addChat.chatname = username;
-        addChat.chattext = chatinput.getText().toString();
-        chat.add(addChat);
-        chatinput.setText("");
-        chatadapter.notifyDataSetChanged();
-        int chatsize = chat.size();
-        if (chatsize >= 5){
-            chat.remove(0);
+        if(chatinput.getText().toString().equals("")){
+            Toast.makeText(this, "You did not enter a valid message", Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            addChat.chattext = chatinput.getText().toString();
+            chat.add(addChat);
+            chatinput.setText("");
             chatadapter.notifyDataSetChanged();
+            int chatsize = chat.size();
+            if (chatsize >= 5) {
+                chat.remove(0);
+                chatadapter.notifyDataSetChanged();
+            }
         }
     }
 
