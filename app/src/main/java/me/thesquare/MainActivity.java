@@ -20,9 +20,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private TextureView textureView;
-    private Camera cam;
     private Record record;
-    private int fileCount;
     private FSDClient fsdClient;
     private static final String TAG = "AndroidCameraApi";
 
@@ -43,14 +41,12 @@ public class MainActivity extends AppCompatActivity {
         Socket serverConnection;
 
         try {
-            serverConnection = new Socket("192.168.0.105",1312);
+            serverConnection = new Socket("145.49.7.49",1312);
             fsdClient = new FSDClient(null, serverConnection.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-//        record = new Record(this, textureView);
-        fileCount = 1;
         ImageButton btn2 = (ImageButton)findViewById(R.id.btnSwitch);
         //set items
         List<chatItem> test = new ArrayList<>();
@@ -60,8 +56,6 @@ public class MainActivity extends AppCompatActivity {
         chatListViewAdapter adapter = new chatListViewAdapter(this,getLayoutInflater(), (ArrayList<chatItem>) test);
 
         listView.setAdapter(adapter);
-
-//        cam = new Camera(textureView, btn2, this, MainActivity.this);
 
         try {
             record = new Record(textureView, fsdClient);
@@ -77,9 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
             // stop recording and release camera
             record.Capture();
-            fileCount++;
         } else {
-            record.setFilename(String.valueOf(fileCount));
             record.start();
         }
     }
@@ -87,17 +79,11 @@ public class MainActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         Log.e(TAG, "onPause");
-//        cam.closeCamera();
-//        cam.stopBackgroundThread();
-        // if we are using MediaRecorder, release it first
         record.releaseMediaRecorder();
-        // release the camera immediately on pause event
         record.releaseCamera();
-//        record.removeTempFiles();
     }
 
     protected void onResume(){
         super.onResume();
-//        cam.resume();
     }
 }

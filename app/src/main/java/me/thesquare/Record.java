@@ -28,7 +28,6 @@ public class Record implements Runnable {
     private File mOutputFile;
     private static final String TAG = "Record class";
     private String filename;
-    private Activity activity;
     private Thread captureThread;
     private FragmentWriter writer;
     private File tmpFile;
@@ -36,12 +35,6 @@ public class Record implements Runnable {
 
     private static final Object isRecordingMut = new Object();
     private boolean isRecording;
-
-
-    public Record(Activity activity, TextureView view){
-        this.activity = activity;
-        this.mPreview = view;
-    }
 
 
     public Record(TextureView cameraPreview, FragmentWriter writer) throws IOException {
@@ -87,21 +80,6 @@ public class Record implements Runnable {
         // inform the user that recording has stopped
         isRecording = false;
         this.releaseCamera();
-    }
-//    public  void prepareTask(){
-//        new MediaPrepareTask().execute(null, null, null);
-//    }
-
-    public void removeTempFiles(){
-        File dir = new File(Environment.getExternalStorageDirectory()+"/theSquare/");
-        if (dir.isDirectory())
-        {
-            String[] children = dir.list();
-            for (int i = 0; i < children.length; i++)
-            {
-                new File(dir, children[i]).delete();
-            }
-        }
     }
 
     public boolean prepareVideoRecorder(){
@@ -170,10 +148,10 @@ public class Record implements Runnable {
 
         try {
             mMediaRecorder.setOutputFile(outputFile.getFD());
+            Log.d(TAG, outputFile.getFD().toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.d(TAG, Environment.getExternalStorageDirectory().getPath());
         // END_INCLUDE (configure_media_recorder)
 
         // Step 5: Prepare configured MediaRecorder
@@ -194,37 +172,6 @@ public class Record implements Runnable {
     public boolean getRecordingState(){
         return isRecording;
     }
-
-    public void setFilename(String filename){
-        this.filename = filename;
-    }
-
-//    class MediaPrepareTask extends AsyncTask<Void, Void, Boolean> {
-//
-//        @Override
-//        protected Boolean doInBackground(Void... voids) {
-//            // initialize video camera
-//            if (prepareVideoRecorder()) {
-//                // Camera is available and unlocked, MediaRecorder is prepared,
-//                // now you can start recording
-//                mMediaRecorder.start();
-//
-//                isRecording = true;
-//            } else {
-//                // prepare didn't work, release the camera
-//                releaseMediaRecorder();
-//                return false;
-//            }
-//            return true;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Boolean result) {
-//            if (!result) {
-//                activity.finish();
-//            }
-//        }
-//    }
 
 
     public void start() {
@@ -262,7 +209,6 @@ public class Record implements Runnable {
                 outputFile.read(buffer);
                 writer.writeFragment(buffer);
                 outputFile.setLength(0);
-
 
 
                 synchronized (isRecordingMut) {
