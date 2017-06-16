@@ -26,12 +26,8 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
     private TextureView textureView;
-    private Camera cam;
-    private Record record;
-    private int fileCount;
-    private static final String TAG = "AndroidCameraApi";
-
     private Recorder recorder;
     private EditText chatinput;
     private String username;
@@ -40,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
     private ApiHandler apiHandler;
     private List<chatItem> chat = new ArrayList<>();
     private chatListViewAdapter chatadapter;
-    private static final String TAG = "MainActivity";
     private PermissionHandler permissionHandler;
 
     @Override
@@ -57,28 +52,32 @@ public class MainActivity extends AppCompatActivity {
         Socket serverConnection;
 
         try {
-            serverConnection = new Socket("145.49.13.101",1312);
+            serverConnection = new Socket("145.49.7.49",1312);
             fsdClient = new FSDClient(null, serverConnection.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        TextureView textview = (TextureView) findViewById(R.id.texture);
+        textureView = (TextureView) findViewById(R.id.texture);
+        assert textureView != null;
 
-        record = new Record(this, textureView);
-        fileCount = 1;
-        ImageButton btn2 = (ImageButton)findViewById(R.id.btnSwitch);
+        try {
+            recorder = new Recorder(textureView, fsdClient);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         //set items
         List<chatItem> test = new ArrayList<>();
-        test.add(chat4);
+        chatItem c = new chatItem();
         // end items
-        ListView listView = (ListView) findViewById(R.id.lvChat);
+        listView = (ListView) findViewById(R.id.lvChat);
         chatListViewAdapter adapter = new chatListViewAdapter(this,getLayoutInflater(), (ArrayList<chatItem>) test);
 
         permissionHandler = new PermissionHandler(this,this.getApplicationContext());
 
         try {
-            recorder = new Recorder(textview, fsdClient);
+            recorder = new Recorder(textureView, fsdClient);
         }
         catch(IOException e){
             Log.e(TAG, e.getMessage());
@@ -90,25 +89,13 @@ public class MainActivity extends AppCompatActivity {
         chatadapter = new chatListViewAdapter(this,getLayoutInflater(), (ArrayList<chatItem>) chat);
 
         listView.setAdapter(chatadapter);
-
-        recorder.start();
-    }
-
-
-            // stop recording and release camera
-            record.Capture();
-            fileCount++;
-        } else {
-            record.setFilename(String.valueOf(fileCount));
-            record.prepareTask();
-        }
     }
 
     public void onPause() {
         super.onPause();
         Log.e(TAG, "onPause");
-        record.releaseMediaRecorder();
-        record.releaseCamera();
+        recorder.releaseMediaRecorder();
+        recorder.releaseCamera();
     }
 
     protected void onResume(){
@@ -139,4 +126,23 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void onCaptureClick(View view) {
+        if (recorder.getRecordingState()) {
+            // BEGIN_INCLUDE(stop_release_media_recorder)
+
+            // stop recording and release camera
+            recorder.Capture();
+        } else {
+            recorder.start();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        recorder.Capture();
+        recorder.releaseMediaRecorder();
+        recorder.releaseCamera();
+    }
 }
