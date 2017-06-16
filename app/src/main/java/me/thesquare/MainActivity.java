@@ -26,6 +26,11 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
+    private TextureView textureView;
+    private Camera cam;
+    private Record record;
+    private int fileCount;
+    private static final String TAG = "AndroidCameraApi";
 
     private Recorder recorder;
     private EditText chatinput;
@@ -41,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
         setContentView(R.layout.activity_main);
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .detectNetwork() // or .detectAll() for all detectable problems
@@ -60,6 +65,15 @@ public class MainActivity extends AppCompatActivity {
 
         TextureView textview = (TextureView) findViewById(R.id.texture);
 
+        record = new Record(this, textureView);
+        fileCount = 1;
+        ImageButton btn2 = (ImageButton)findViewById(R.id.btnSwitch);
+        //set items
+        List<chatItem> test = new ArrayList<>();
+        test.add(chat4);
+        // end items
+        ListView listView = (ListView) findViewById(R.id.lvChat);
+        chatListViewAdapter adapter = new chatListViewAdapter(this,getLayoutInflater(), (ArrayList<chatItem>) test);
 
         permissionHandler = new PermissionHandler(this,this.getApplicationContext());
 
@@ -81,11 +95,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+            // stop recording and release camera
+            record.Capture();
+            fileCount++;
+        } else {
+            record.setFilename(String.valueOf(fileCount));
+            record.prepareTask();
+        }
+    }
 
     public void onPause() {
         super.onPause();
         Log.e(TAG, "onPause");
-
+        record.releaseMediaRecorder();
+        record.releaseCamera();
     }
 
     protected void onResume(){
