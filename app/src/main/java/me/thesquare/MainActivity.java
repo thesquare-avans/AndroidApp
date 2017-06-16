@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -26,7 +27,8 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
-
+    private static final String TAG = "MainActivity";
+    private TextureView textureView;
     private Recorder recorder;
     private EditText chatinput;
     private String username;
@@ -35,13 +37,12 @@ public class MainActivity extends AppCompatActivity {
     private ApiHandler apiHandler;
     private List<chatItem> chat = new ArrayList<>();
     private chatListViewAdapter chatadapter;
-    private static final String TAG = "MainActivity";
     private PermissionHandler permissionHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
         setContentView(R.layout.activity_main);
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .detectNetwork() // or .detectAll() for all detectable problems
@@ -52,19 +53,32 @@ public class MainActivity extends AppCompatActivity {
         Socket serverConnection;
 
         try {
-            serverConnection = new Socket("145.49.13.101",1312);
+            serverConnection = new Socket("145.49.7.49",1312);
             fsdClient = new FSDClient(null, serverConnection.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        TextureView textview = (TextureView) findViewById(R.id.texture);
+        textureView = (TextureView) findViewById(R.id.texture);
+        assert textureView != null;
 
+        try {
+            recorder = new Recorder(textureView, fsdClient);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //set items
+        List<chatItem> test = new ArrayList<>();
+        chatItem c = new chatItem();
+        // end items
+        listView = (ListView) findViewById(R.id.lvChat);
+        chatListViewAdapter adapter = new chatListViewAdapter(this,getLayoutInflater(), (ArrayList<chatItem>) test);
 
         permissionHandler = new PermissionHandler(this,this.getApplicationContext());
 
         try {
-            recorder = new Recorder(textview, fsdClient);
+            recorder = new Recorder(textureView, fsdClient);
         }
         catch(IOException e){
             Log.e(TAG, e.getMessage());
@@ -76,16 +90,13 @@ public class MainActivity extends AppCompatActivity {
         chatadapter = new chatListViewAdapter(this,getLayoutInflater(), (ArrayList<chatItem>) chat);
 
         listView.setAdapter(chatadapter);
-
-        recorder.start();
     }
-
-
 
     public void onPause() {
         super.onPause();
         Log.e(TAG, "onPause");
-
+        recorder.releaseMediaRecorder();
+        recorder.releaseCamera();
     }
 
     protected void onResume(){
@@ -103,17 +114,38 @@ public class MainActivity extends AppCompatActivity {
     public void AddChat(View view){
 
         chatItem addChat = new chatItem();
-        username = "Testuser";
         addChat.chatname = username;
-        addChat.chattext = chatinput.getText().toString();
-        chat.add(addChat);
-        chatinput.setText("");
-        chatadapter.notifyDataSetChanged();
-        int chatsize = chat.size();
-        if (chatsize >= 5){
-            chat.remove(0);
+        if(chatinput.getText().toString().equals("")){
+            Toast.makeText(this, "You did not enter a valid message", Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            addChat.chattext = chatinput.getText().toString();
+            chat.add(addChat);
+            chatinput.setText("");
             chatadapter.notifyDataSetChanged();
+            int chatsize = chat.size();
+            if (chatsize >= 5) {
+                chat.remove(0);
+                chatadapter.notifyDataSetChanged();
+            }
         }
     }
 
+    public void onCaptureClick(View view) {
+        if (recorder.getRecordingState()) {
+            // BEGIN_INCLUDE(stop_release_media_recorder)
+            Log.d(TAG, "Already recording");
+            // stop recording and release camera
+        } else {
+            recorder.start();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        recorder.releaseMediaRecorder();
+        recorder.releaseCamera();
+    }
 }
