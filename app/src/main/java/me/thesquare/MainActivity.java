@@ -129,9 +129,8 @@ public class MainActivity extends AppCompatActivity {
     public void onCaptureClick(View view) {
         if (recorder.getRecordingState()) {
             // BEGIN_INCLUDE(stop_release_media_recorder)
-
+            Log.d(TAG, "Already recording");
             // stop recording and release camera
-            recorder.Capture();
         } else {
             recorder.start();
         }
@@ -141,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        recorder.Capture();
         recorder.releaseMediaRecorder();
         recorder.releaseCamera();
     }
