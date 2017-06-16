@@ -1,5 +1,7 @@
 package me.thesquare.models;
 
+import java.util.UUID;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
@@ -11,10 +13,19 @@ import io.realm.annotations.Required;
 public class UserModel extends RealmObject {
     @PrimaryKey
     @Required
+    private UUID id;
     private String username;
     private byte[] privateKey, publicKey;
 
     public UserModel() {
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public void setUsername(String username) {

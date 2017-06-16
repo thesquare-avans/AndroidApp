@@ -44,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
                     Intent i = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(i);
                 }
-                else{
+                else {
                     Context context = getApplicationContext();
                     CharSequence text = "Please fill in the login field.";
                     int duration = Toast.LENGTH_SHORT;
@@ -72,9 +72,11 @@ public class LoginActivity extends AppCompatActivity {
             keyManager = new KeyManager();
             keyManager.generateKey();
             UserModel user = new UserModel();
+            // Set the user ID from the API response
+            // user.setId();
             user.setUsername( txtUsername.getText().toString() );
-            user.setPrivateKey( keyManager.getPrivateKey().getEncoded());
-            user.setPublicKey(keyManager.getPublicKey().getEncoded());
+            user.setPrivateKey( keyManager.getPrivateKey().getEncoded() );
+            user.setPublicKey( keyManager.getPublicKey().getEncoded() );
             keyManager.setUser(user);
             apihandler = new ApiHandler(keyManager);
             apihandler.register(txtUsername.getText().toString(), this);
@@ -103,7 +105,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if ( result != null && result.size() > 0) {
             for (int i = 0; i < result.size(); i++) {
-                Log.d( "Player name", result.get(i).getUsername() );
+                Log.d( "Name", result.get(i).getUsername() );
                 Log.d( "Public key", result.get(i).getPublicKey().toString() );
                 Log.d( "Private key", result.get(i).getPrivateKey().toString() );
             }

@@ -51,7 +51,7 @@ public class ApiHandler {
         RequestQueue queue = Volley.newRequestQueue(ctx);
 
         publickey = keyManager.getPublicKey().toString();
-        String registerurl = "http://api.thesquare.dev.byteflock.com/v1/register";
+        String registerurl = "http://api.thesquare.me/v1/register";
         HashMap<String, String> params = new HashMap<String, String>();
 
         params.put("name", username);
