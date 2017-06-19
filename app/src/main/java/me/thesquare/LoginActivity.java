@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -88,27 +89,50 @@ public class LoginActivity extends AppCompatActivity {
             keyManager.generateKey();
             UserModel user = new UserModel();
             // Set the user ID from the API response
-            user.setId(UUID.randomUUID());
+            user.setId("");
             user.setUsername( txtUsername.getText().toString() );
             user.setPrivateKey( keyManager.getPrivateKey().getEncoded() );
             user.setPublicKey( keyManager.getPublicKey().getEncoded() );
             keyManager.setUser(user);
             apihandler = new ApiHandler(keyManager);
-            apihandler.register(txtUsername.getText().toString(), this);
+            apihandler.register(txtUsername.getText().toString(), this, new VolleyCallback(){
+                @Override
+                public void onSuccess(String id, String name){
+                    Realm realm = Realm.getDefaultInstance();
+                    RealmResults<UserModel> result = realm.where( UserModel.class ).equalTo( "username", name ).findAll();
+                    List<UserModel> user = realm.copyFromRealm(result);
+                    UserModel userModel = user.get(0);
+
+                    userModel.setId(id);
+
+                    if(!result.isEmpty()){
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(userModel);
+                        realm.commitTransaction();
+                        Toast.makeText(LoginActivity.this,
+                                "Gebruiker: " + userModel.getUsername() + " toegevoegd!", Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        Toast.makeText(LoginActivity.this,
+                                "Gebruiker bestaat al. Probeer het nog een keer met een andere gebruikersnaam.", Toast.LENGTH_SHORT).show();
+
+                    }
+                    finish();
+                }
+            });
+
             apihandler.authenticate(txtUsername.getText().toString(), keyManager.getPublicKey().toString());
 
-            /*
-              transaction to the database to update a player
-             */
+                    /*
+                      transaction to the database to update a player
+                    */
             realm.beginTransaction();
             realm.copyToRealmOrUpdate(user);
             realm.commitTransaction();
 
             addToSharedPref(user);
 
-            Toast.makeText(LoginActivity.this,
-                    "Gebruiker: " + user.getUsername() + " toegevoegd!", Toast.LENGTH_SHORT).show();
-            finish();
+
         }
     }
 

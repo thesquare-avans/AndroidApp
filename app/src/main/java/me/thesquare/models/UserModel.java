@@ -20,7 +20,7 @@ public class UserModel extends RealmObject {
     public UserModel() {
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id.toString();
     }
 

@@ -20,6 +20,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -47,7 +48,7 @@ public class ApiHandler {
         this.keyManager = keyManager;
     }
 
-    public void register(String username, Context ctx) {
+    public void register(String username, Context ctx, final VolleyCallback callback) {
         RequestQueue queue = Volley.newRequestQueue(ctx);
 
         publickey = keyManager.getPublicKey().toString();
@@ -67,8 +68,20 @@ public class ApiHandler {
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, registerurl, new JSONObject(requestBody), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                Log.d("Test", "test");
-                Log.d("Test", response.toString());
+                try {
+                    String payload = response.getString("payload");
+                    JSONObject payloadObj = new JSONObject(payload);
+                    String user = payloadObj.getString("user");
+                    JSONObject userObj = new JSONObject(user);
+                    String id = userObj.getString("id");
+                    String name = userObj.getString("name");
+
+                    callback.onSuccess(id, name);
+                }
+                catch(JSONException e)
+                {
+                    e.getMessage();
+                }
                 if(keyManager.verifyResponse(response)) {
                     Log.d("TheSquare", "Signature valid");
                 }else{
