@@ -123,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             recorder.stop();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             Log.d(TAG, e.getMessage());
         }
         recorder.releaseMediaRecorder();
