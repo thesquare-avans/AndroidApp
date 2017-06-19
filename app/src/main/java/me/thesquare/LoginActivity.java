@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -73,7 +74,7 @@ public class LoginActivity extends AppCompatActivity {
             keyManager.generateKey();
             UserModel user = new UserModel();
             // Set the user ID from the API response
-            // user.setId();
+            user.setId(UUID.randomUUID());
             user.setUsername( txtUsername.getText().toString() );
             user.setPrivateKey( keyManager.getPrivateKey().getEncoded() );
             user.setPublicKey( keyManager.getPublicKey().getEncoded() );

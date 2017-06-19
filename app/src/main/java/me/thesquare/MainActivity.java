@@ -1,19 +1,11 @@
 package me.thesquare;
 
-import android.content.pm.ActivityInfo;
-import android.graphics.SurfaceTexture;
-import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Surface;
-import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -21,7 +13,6 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,8 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private FSDClient fsdClient;
     private ListView listView;
     private ApiHandler apiHandler;
-    private List<chatItem> chat = new ArrayList<>();
-    private chatListViewAdapter chatadapter;
+    private List<ChatItem> chat = new ArrayList<>();
+    private ChatListViewAdapter chatadapter;
     private PermissionHandler permissionHandler;
 
     @Override
@@ -69,11 +60,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //set items
-        List<chatItem> test = new ArrayList<>();
-        chatItem c = new chatItem();
+        List<ChatItem> test = new ArrayList<>();
+        ChatItem c = new ChatItem();
         // end items
         listView = (ListView) findViewById(R.id.lvChat);
-        chatListViewAdapter adapter = new chatListViewAdapter(this,getLayoutInflater(), (ArrayList<chatItem>) test);
+        ChatListViewAdapter adapter = new ChatListViewAdapter(this,getLayoutInflater(), (ArrayList<ChatItem>) test);
 
         permissionHandler = new PermissionHandler(this,this.getApplicationContext());
 
@@ -87,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         ImageButton btn2 = (ImageButton)findViewById(R.id.btnSwitch);
         chatinput = (EditText)findViewById(R.id.chatinput);
         listView = (ListView) findViewById(R.id.lvChat);
-        chatadapter = new chatListViewAdapter(this,getLayoutInflater(), (ArrayList<chatItem>) chat);
+        chatadapter = new ChatListViewAdapter(this,getLayoutInflater(), (ArrayList<ChatItem>) chat);
 
         listView.setAdapter(chatadapter);
     }
@@ -112,11 +103,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void AddChat(View view){
-        chatItem addChat = new chatItem();
+        ChatItem addChat = new ChatItem();
+
         addChat.chatname = username;
         if(chatinput.getText().toString().equals("")){
             Toast.makeText(this, "You did not enter a valid message", Toast.LENGTH_SHORT).show();
-            return;
         } else {
             addChat.chattext = chatinput.getText().toString();
             chat.add(addChat);
