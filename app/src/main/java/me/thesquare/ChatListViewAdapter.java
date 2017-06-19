@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -14,13 +13,13 @@ import java.util.ArrayList;
 /**
  * Created by dkroeske on 8/29/15.
  */
-public class chatListViewAdapter extends BaseAdapter {
+public class ChatListViewAdapter extends BaseAdapter {
 
     Context mContext;
     LayoutInflater mInflator;
     ArrayList mPersonArrayList;
 
-    public chatListViewAdapter(Context context, LayoutInflater layoutInflater, ArrayList<chatItem> personArrayList)
+    public ChatListViewAdapter(Context context, LayoutInflater layoutInflater, ArrayList<ChatItem> personArrayList)
     {
         mContext = context;
         mInflator = layoutInflater;
@@ -62,7 +61,7 @@ public class chatListViewAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        chatItem person = (chatItem) mPersonArrayList.get(position);
+        ChatItem person = (ChatItem) mPersonArrayList.get(position);
 
         viewHolder.name.setText(person.chatname);
         viewHolder.text.setText(person.chattext);

@@ -52,7 +52,10 @@ public class Recorder implements Runnable {
             mMediaRecorder = null;
             // Lock camera for later use i.e taking it back from MediaRecorder.
             // MediaRecorder doesn't need it anymore and we will release it if the activity pauses.
-            mCamera.lock();
+
+            if (mCamera != null) {
+                mCamera.lock();
+            }
         }
     }
 
@@ -69,7 +72,18 @@ public class Recorder implements Runnable {
 
         // BEGIN_INCLUDE (configure_preview)
         Log.d(TAG, "Start preparing");
-        mCamera = CameraHelper.getDefaultCameraInstance();
+        try {
+            mCamera = CameraHelper.getDefaultCameraInstance();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        if (mCamera == null){
+            mCamera = CameraHelper.getDefaultBackFacingCameraInstance();
+        }
+        if (mCamera == null){
+            return false;
+        }
 
         // We need to make sure that our preview and recording video size are supported by the
         // camera. Query camera to find all the sizes and choose the optimal size given the
@@ -116,13 +130,6 @@ public class Recorder implements Runnable {
         // Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
         mMediaRecorder.setProfile(profile);
         mMediaRecorder.setOrientationHint(90);
-//
-//        // Step 4: Set output file
-//        mOutputFile = CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO);
-//        if (mOutputFile == null) {
-//            return false;
-//        }
-//        Log.d(TAG, mOutputFile.getPath());
 
         try {
             mMediaRecorder.setOutputFile(outputFile.getFD());
@@ -153,7 +160,6 @@ public class Recorder implements Runnable {
     }
 
     public void start() {
-
         synchronized (isRecordingMut) {
             isRecording = true;
         }

@@ -13,7 +13,7 @@ import io.realm.annotations.Required;
 public class UserModel extends RealmObject {
     @PrimaryKey
     @Required
-    private UUID id;
+    private String id;
     private String username;
     private byte[] privateKey, publicKey;
 
@@ -21,10 +21,10 @@ public class UserModel extends RealmObject {
     }
 
     public void setId(UUID id) {
-        this.id = id;
+        this.id = id.toString();
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
