@@ -30,7 +30,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        permissionHandler = new PermissionHandler(this,this.getApplicationContext());
+        permissionHandler = new PermissionHandler(this.getApplicationContext());
         checkPermissions();
 
         sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
@@ -48,10 +48,7 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(i);
                 }
                 else {
-                    Context context = getApplicationContext();
-                    CharSequence text = "Please fill in the login field.";
-                    int duration = Toast.LENGTH_SHORT;
-                    Toast toast =  Toast.makeText(context,text,duration);
+                    Toast toast =  Toast.makeText( getApplicationContext(), "Please fill in the login field.", Toast.LENGTH_SHORT);
                     toast.show();
                 }
             }

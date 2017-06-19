@@ -21,19 +21,16 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public class PermissionHandler implements PermissionListener {
     private Context context;
-    private final Activity activity;
     private final PermissionsActivity permissionsActivity;
     private boolean micPerm = false, camPerm = false;
     private boolean[] perms = new boolean[2];
 
-    public PermissionHandler(Activity activity, Context context){
-        this.activity = activity;
+    public PermissionHandler(Context context){
         this.context = context;
         this.permissionsActivity = null;
     }
 
     public PermissionHandler(PermissionsActivity permissionsActivity, Context context){
-        this.activity = null;
         this.context = context;
         this.permissionsActivity = permissionsActivity;
     }

@@ -19,17 +19,14 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
-    private TextureView textureView;
     private Recorder recorder;
     private EditText chatInput;
     private FSDClient fsdClient;
-    private ListView listView;
     private List<ChatItem> chat = new ArrayList<>();
     private ChatListViewAdapter chatAdapter;
     private PermissionHandler permissionHandler;
     private Chronometer stopWatch;
     private boolean isStarted;
-    private Socket serverConnection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,20 +39,19 @@ public class MainActivity extends AppCompatActivity {
                 .permitNetwork() //permit Network access
                 .build());
 
-        textureView = (TextureView) findViewById(R.id.texture);
+        TextureView textureView = (TextureView) findViewById(R.id.texture);
         stopWatch = (Chronometer) findViewById(R.id.stopWatch);
         chatInput = (EditText)findViewById(R.id.chatinput);
-        listView = (ListView) findViewById(R.id.lvChat);
-        listView = (ListView) findViewById(R.id.lvChat);
-        permissionHandler = new PermissionHandler(this,this.getApplicationContext());
+        ListView listView = (ListView) findViewById(R.id.lvChat);
+        permissionHandler = new PermissionHandler(this.getApplicationContext());
         chatAdapter = new ChatListViewAdapter(this,getLayoutInflater(), (ArrayList<ChatItem>) chat);
 
 
         try {
-            serverConnection = new Socket("145.49.7.49",1312);
+            Socket serverConnection = new Socket("145.49.13.101", 1234);
             fsdClient = new FSDClient(null, serverConnection.getOutputStream());
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
         }
         // TODO: don't use try/catch and change server settings
 
@@ -99,8 +95,8 @@ public class MainActivity extends AppCompatActivity {
             chat.add(addChat);
             chatInput.setText("");
             chatAdapter.notifyDataSetChanged();
-            int chatsize = chat.size();
-            if (chatsize >= 5) {
+            int chatSize = chat.size();
+            if (chatSize >= 5) {
                 chat.remove(0);
                 chatAdapter.notifyDataSetChanged();
             }
@@ -123,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         try {
             recorder.stop();
         } catch (InterruptedException e) {
