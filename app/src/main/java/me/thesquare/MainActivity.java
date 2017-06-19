@@ -74,8 +74,7 @@ public class MainActivity extends AppCompatActivity {
         catch(IOException e){
             Log.e(TAG, e.getMessage());
         }
-
-        ImageButton btn2 = (ImageButton)findViewById(R.id.btnSwitch);
+        
         chatinput = (EditText)findViewById(R.id.chatinput);
         listView = (ListView) findViewById(R.id.lvChat);
         chatadapter = new ChatListViewAdapter(this,getLayoutInflater(), (ArrayList<ChatItem>) chat);
