@@ -19,14 +19,8 @@ package me.thesquare;
 import android.annotation.TargetApi;
 import android.hardware.Camera;
 import android.os.Build;
-import android.os.Environment;
-import android.util.Log;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Camera related utilities.
