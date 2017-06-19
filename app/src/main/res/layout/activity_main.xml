@@ -14,17 +14,6 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true" />
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:srcCompat="@drawable/switchcam"
-        android:layout_marginEnd="10dp"
-        android:layout_marginTop="0dp"
-        android:background="@null"
-        android:id="@+id/btnSwitch"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true" />
-
 
     <ListView
         android:layout_height="220dp"
@@ -45,21 +34,22 @@
         android:id="@+id/chatinput"
         android:layout_width="270dp"
         android:layout_height="50dp"
-        android:hint="Chat here..."
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="53dp" />
+        android:layout_marginLeft="10dp"
+        android:hint="Chat here..." />
 
     <Button
         android:id="@+id/btnChat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:text="chat"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/chatinput"
+        android:layout_marginRight="10dp"
+        android:layout_toEndOf="@+id/chatinput"
         android:onClick="AddChat"
-        android:layout_alignBaseline="@+id/chatinput"
-        android:layout_alignBottom="@+id/chatinput"
-        android:layout_alignEnd="@+id/btnSwitch" />
+        android:paddingRight="10dp"
+        android:text="chat" />
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
@@ -87,5 +77,7 @@
         android:text="123456"
         android:textColor="#ffffff"
         android:textSize="20sp" />
+
+
 
 </RelativeLayout>

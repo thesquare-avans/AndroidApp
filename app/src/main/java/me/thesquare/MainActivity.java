@@ -112,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void AddChat(View view){
-
         chatItem addChat = new chatItem();
         addChat.chatname = username;
         if(chatinput.getText().toString().equals("")){

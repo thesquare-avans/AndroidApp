@@ -7,4 +7,5 @@ package me.thesquare;
 public class chatItem {
     public String chatname;
     public String chattext;
+
 }
