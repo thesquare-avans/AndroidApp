@@ -25,6 +25,7 @@ public class LoginActivity extends AppCompatActivity {
     private KeyManager keyManager;
     private SharedPreferences sharedPref;
     private PermissionHandler permissionHandler;
+    private String current_user;
     private ApiHandler apihandler;
 
     @Override
@@ -35,6 +36,9 @@ public class LoginActivity extends AppCompatActivity {
         checkPermissions();
 
         sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        current_user = sharedPref.getString("cur_user", null);
+        userExists(current_user);
+
         txtUsername = (EditText) findViewById(R.id.editText);
         btnLogin = (Button) findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(new View.OnClickListener(){
@@ -54,6 +58,16 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void userExists(String current_user){
+
+        if (current_user != null) {
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        // Else stay here
     }
 
     @Override
@@ -90,13 +104,19 @@ public class LoginActivity extends AppCompatActivity {
             realm.copyToRealmOrUpdate(user);
             realm.commitTransaction();
 
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString("cur_user", user.getUsername());
-            editor.apply();
+            addToSharedPref(user);
 
             Toast.makeText(LoginActivity.this,
                     "Gebruiker: " + user.getUsername() + " toegevoegd!", Toast.LENGTH_SHORT).show();
             finish();
+        }
+    }
+
+    private void addToSharedPref(UserModel user){
+        if (user != null) {
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("cur_user", user.getUsername());
+            editor.apply();
         }
     }
 
@@ -114,6 +134,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void removeAllUsers(){
+        realm = Realm.getDefaultInstance();
         RealmResults<UserModel> result = realm.where(UserModel.class).findAll();
 
         result.deleteAllFromRealm();
