@@ -1,22 +1,15 @@
 package me.thesquare;
 
-import android.util.Base64;
 import android.util.Log;
-
-import com.google.gson.Gson;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.spongycastle.util.io.pem.PemObject;
-import org.spongycastle.util.io.pem.PemObjectParser;
 import org.spongycastle.util.io.pem.PemReader;
 import org.spongycastle.util.io.pem.PemWriter;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -30,20 +23,15 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
-import me.thesquare.models.MessageModel;
-import me.thesquare.models.ResponseModel;
-import me.thesquare.models.UserModel;
-
 /**
  * Created by ruben on 13-6-2017.
  */
 
 public class KeyManager {
+    private static final String TAG = "KeyManager";
+    private final static char[] hexArray = "0123456789abcdef".toCharArray();
     private KeyPairGenerator kpg;
     private KeyPair pair;
-    private static Gson gson = new Gson();
-    private static UserModel user;
-    private String decodedkey;
     private String serverPublicKeyPem = "-----BEGIN PUBLIC KEY-----\n" +
             "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz5UbP9pCgzBsqSCrOj67\n" +
             "ChvmHEr5cxBrXA4vA7I9EVvSnmasIZGuARD4gJSxIeX57kwKURinQq0dxGsMKwqd\n" +
@@ -54,13 +42,11 @@ public class KeyManager {
             "7QIDAQAB\n" +
             "-----END PUBLIC KEY-----";
     private static Signature sig;
-    private ResponseModel response;
     private PrivateKey privateKey;
     private PublicKey publicKey;
     private PublicKey serverPublicKey;
     private String publicKeyPem;
 
-    // genereren en verifieren keys
 
     public void generateKey() {
         try {
@@ -88,25 +74,16 @@ public class KeyManager {
             X509EncodedKeySpec spec = new X509EncodedKeySpec(publicKeyContent);
             this.serverPublicKey = kf.generatePublic(spec);
         }
-        catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
+        catch (NoSuchAlgorithmException | IOException | NoSuchProviderException | InvalidKeySpecException e) {
+            Log.d(TAG, e.getMessage());
         }
     }
+
 
     public PrivateKey getPrivateKey() {
         return privateKey;
     }
 
-//    public void setPrivateKey(byte[] privateKey) {
-//        this.privateKey = privateKey;
-//    }
 
     public PublicKey getPublicKey() {
         return publicKey;
@@ -114,56 +91,10 @@ public class KeyManager {
 
     }
 
-//    public void setPublicKey(byte[] publicKey) {
-//        this.publicKey = publicKey;
-//
-//        StringWriter writer = new StringWriter();
-//        PemWriter pemWriter = new PemWriter(writer);
-//
-//        try {
-//            pemWriter.writeObject(new PemObject("PUBLIC KEY", publicKey));
-//            pemWriter.flush();
-//            pemWriter.close();
-//        } catch (IOException err) {
-//            Log.d("err", err.getMessage());
-//        }
-//        this.publicKeyPem = writer.toString();
-//        Log.d("publicKey", this.publicKeyPem);
-//    }
-
     public String getPublicKeyPem() {
         return this.publicKeyPem;
     }
 
-//    public static PublicKey getPublicKey(String key) {
-//        try {
-//            byte[] bytes = Base64.decode(key.getBytes(), Base64.DEFAULT);
-//            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(bytes);
-//            KeyFactory kf = KeyFactory.getInstance("SHA256withRSA");
-//
-//            return kf.generatePublic(keySpec);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        return null;
-//    }
-//
-//    public static PrivateKey getPrivateKey(String key) {
-//        try {
-//            byte[] bytes = Base64.decode(key.getBytes(), Base64.DEFAULT);
-//            X509EncodedKeySpec  keySpec = new X509EncodedKeySpec(bytes);
-//
-//            KeyFactory kf = KeyFactory.getInstance("SHA256withRSA");
-//
-//            return kf.generatePrivate(keySpec);
-//        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return null;
-//    }
-    private final static char[] hexArray = "0123456789abcdef".toCharArray();
     public static String bytesToHex(byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];
         for ( int j = 0; j < bytes.length; j++ ) {
@@ -210,11 +141,11 @@ public class KeyManager {
             return sig.verify(hexStringToByteArray(signature));
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
             Log.d("TheSquare", "No algorithm, invalid key or invalid signature");
-            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
             return false;
         } catch (UnsupportedEncodingException e) {
             Log.d("TheSquare", "Unsupported encoding");
-            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
             return false;
         }
     }
@@ -226,17 +157,12 @@ public class KeyManager {
             sig.update(message.getBytes("UTF-8"));
 
             return bytesToHex(sig.sign());
-        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException | UnsupportedEncodingException e) {
+            Log.d(TAG, e.getMessage());
         }
 
         return null;
     }
 
-    public void setUser(UserModel user) {
-        this.user = user;
-    }
 }
 

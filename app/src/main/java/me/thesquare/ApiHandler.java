@@ -127,29 +127,6 @@ public class ApiHandler {
         queue.add(jsonRequest);
     }
 
-    public void authenticate(String username, String publickey) {
-        //uri van api
-        String url = "http://api.thesquare.me/v1/me";
-        StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Gson gson = new Gson();
-                ResponseModel model = gson.fromJson(response, ResponseModel.class);
-                Log.d("Response is: ", " " + response.substring(0, 500));
-
-//                if (keyManager.verifyResponse(model)) {
-//                    PayloadModel payload = gson.fromJson(model.getPayload(), PayloadModel.class);
-//                }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        });
-    }
-
     public Map<String, String> getHeaders() throws AuthFailureError {
         Map<String, String> params = new HashMap<String, String>();
         params.put("X-PublicKey", user.getPublicKey().toString());
