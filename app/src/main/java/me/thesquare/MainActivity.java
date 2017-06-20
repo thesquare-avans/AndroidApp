@@ -73,11 +73,6 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, e.getMessage());
         }
 
-        KeyManager manager = new KeyManager();
-        ApiHandler handler = new ApiHandler(manager,this);
-
-        SharedPreferences pref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-        String current_user = pref.getString("cur_user", null);
         listView.setAdapter(chatAdapter);
         test();
     }
@@ -93,10 +88,8 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         checkPermissions();
     }
+
     private void test(){
-        SharedPreferences pref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-        String current_user = pref.getString("cur_user", null);
-        Realm realm = Realm.getDefaultInstance();
 
         KeyManager manager = ((TheSquareApplication) this.getApplication()).keyManager;
         ApiHandler handler = new ApiHandler(manager, this);
@@ -104,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
         handler.startStream("Stream 1", new StreamResponse() {
             @Override
             public void on(StreamModel streamModel) {
-                Log.e(TAG,"wholla");
                 Log.e(TAG, streamModel.toString());
             }
         });
@@ -138,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
     public void onCaptureClick(View view) {
         if (!isStarted){
             stopWatch.setBase(SystemClock.elapsedRealtime());
-
 
             stopWatch.start();
             isStarted = true;
