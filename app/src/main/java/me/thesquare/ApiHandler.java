@@ -117,17 +117,11 @@ public class ApiHandler {
         RealmHandler handler = new RealmHandler();
         UserModel userChat = handler.getUser(username);
 
-<<<<<<< HEAD
+
         byte[] publicKeyByte = Base64.encode(userChat.getPublicKey(), 0);
         publickey = new String(publicKeyByte);
         publickey = String.valueOf(userChat.getPublicKey());
-        String registerurl = "http://api.thesquare.me/v1/streams";
-=======
-        byte[] publicKeyByte = Base64.encode(user.getPublicKey(), 0);
-        publickey = new String(publicKeyByte);
-        publickey = String.valueOf(userChat.getPublicKey());
         String registerURL = "http://api.thesquare.me/v1/streams";
->>>>>>> 3f96e0b06f0f9460753d78f71760591ace71d181
         HashMap<String, String> params = new HashMap<>();
 
         params.put("name", username);
