@@ -10,11 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
-
 import io.realm.Realm;
 import io.realm.RealmResults;
 import me.thesquare.models.UserModel;
@@ -33,7 +30,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        permissionHandler = new PermissionHandler(this,this.getApplicationContext());
+        permissionHandler = new PermissionHandler(this.getApplicationContext());
         checkPermissions();
 
         sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
@@ -51,10 +48,7 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(i);
                 }
                 else {
-                    Context context = getApplicationContext();
-                    CharSequence text = "Please fill in the login field.";
-                    int duration = Toast.LENGTH_SHORT;
-                    Toast toast =  Toast.makeText(context,text,duration);
+                    Toast toast =  Toast.makeText( getApplicationContext(), "Please fill in the login field.", Toast.LENGTH_SHORT);
                     toast.show();
                 }
             }
@@ -93,7 +87,6 @@ public class LoginActivity extends AppCompatActivity {
             user.setUsername( txtUsername.getText().toString() );
             user.setPrivateKey( keyManager.getPrivateKey().getEncoded() );
             user.setPublicKey( keyManager.getPublicKey().getEncoded() );
-            keyManager.setUser(user);
             apihandler = new ApiHandler(keyManager);
             apihandler.register(txtUsername.getText().toString(), this, new VolleyCallback(){
                 @Override
@@ -123,18 +116,15 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
 
-            apihandler.authenticate(txtUsername.getText().toString(), keyManager.getPublicKey().toString());
 
-                    /*
-                      transaction to the database to update a player
-                    */
+            /*
+              transaction to the database to update a player
+            */
             realm.beginTransaction();
             realm.copyToRealmOrUpdate(user);
             realm.commitTransaction();
 
             addToSharedPref(user);
-
-
         }
     }
 

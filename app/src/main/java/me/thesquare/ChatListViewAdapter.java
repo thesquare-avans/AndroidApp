@@ -10,14 +10,11 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-/**
- * Created by dkroeske on 8/29/15.
- */
 public class ChatListViewAdapter extends BaseAdapter {
 
-    Context mContext;
-    LayoutInflater mInflator;
-    ArrayList mPersonArrayList;
+    private Context mContext;
+    private LayoutInflater mInflator;
+    private ArrayList mPersonArrayList;
 
     public ChatListViewAdapter(Context context, LayoutInflater layoutInflater, ArrayList<ChatItem> personArrayList)
     {
@@ -63,8 +60,8 @@ public class ChatListViewAdapter extends BaseAdapter {
 
         ChatItem person = (ChatItem) mPersonArrayList.get(position);
 
-        viewHolder.name.setText(person.chatname);
-        viewHolder.text.setText(person.chattext);
+        viewHolder.name.setText(person.getChatname());
+        viewHolder.text.setText(person.getChattext());
 
         return convertView;
     }
