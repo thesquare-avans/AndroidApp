@@ -1,5 +1,8 @@
 package me.thesquare;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.os.SystemClock;
@@ -15,6 +18,10 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
+import me.thesquare.models.UserModel;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -32,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         isStarted = false;
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .detectNetwork() // or .detectAll() for all detectable problems
@@ -106,6 +114,20 @@ public class MainActivity extends AppCompatActivity {
     public void onCaptureClick(View view) {
         if (!isStarted){
             stopWatch.setBase(SystemClock.elapsedRealtime());
+
+            KeyManager manager = new KeyManager();
+            ApiHandler handler = new ApiHandler(manager);
+
+            SharedPreferences pref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+            String current_user = pref.getString("cur_user", null);
+
+            handler.chatService(current_user, this.getApplicationContext(), new VolleyCallback() {
+                @Override
+                public void onSuccess(String id, String name) {
+
+                }
+            });
+          
             stopWatch.start();
             isStarted = true;
         }
