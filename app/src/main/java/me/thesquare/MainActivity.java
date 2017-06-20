@@ -74,22 +74,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         KeyManager manager = new KeyManager();
-        ApiHandler handler = new ApiHandler(manager);
+        ApiHandler handler = new ApiHandler(manager,this);
 
         SharedPreferences pref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         String current_user = pref.getString("cur_user", null);
-
-        try {
-            handler.chatService(current_user, this.getApplicationContext(), new VolleyCallback() {
-                @Override
-                public void onSuccess(UserModel user) {
-
-                }
-            });
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        }
-
         listView.setAdapter(chatAdapter);
         test();
     }

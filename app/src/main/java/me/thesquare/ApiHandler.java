@@ -184,7 +184,6 @@ public class ApiHandler {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        PrivateKey tempKey  = kf.generatePrivate(new X509EncodedKeySpec(userChat.getPrivateKey()));
 
         request(Request.Method.POST, "/v1/register", parameters, new ApiResponse(){
             @Override

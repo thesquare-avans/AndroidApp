@@ -72,6 +72,10 @@ public class LoginActivity extends AppCompatActivity {
         if (current_user != null) {
             RealmResults<UserModel> result = realm.where( UserModel.class ).equalTo( "username", current_user).findAll();
             List<UserModel> user = realm.copyFromRealm(result);
+            if(user.isEmpty()) {
+                return false;
+            }
+            
             UserModel userModel = user.get(0);
 
             if(userModel == null) {
