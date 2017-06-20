@@ -103,11 +103,13 @@ public class LoginActivity extends AppCompatActivity {
                     List<UserModel> user = realm.copyFromRealm(result);
                     UserModel userModel = user.get(0);
 
-                    userModel.setId(id);
+
 
                     if(!result.isEmpty()){
                         realm.beginTransaction();
+                        //Hier gaat iets mis
                         realm.copyToRealmOrUpdate(userModel);
+                        userModel.setId(id);
                         realm.commitTransaction();
                         Toast.makeText(LoginActivity.this,
                                 "Gebruiker: " + userModel.getUsername() + " toegevoegd!", Toast.LENGTH_SHORT).show();
