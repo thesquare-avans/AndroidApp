@@ -27,20 +27,20 @@ import me.thesquare.models.UserModel;
 public class ApiHandler {
     private UserModel user;
     private KeyManager keyManager;
-    private String username, publickey;
+    private String  publickey;
 
     public ApiHandler(KeyManager keyManager) {
         this.keyManager = keyManager;
     }
 
-    public void register(String username, Context ctx, final VolleyCallback callback) {
+    public void register(final UserModel userModel, Context ctx, final VolleyCallback callback) {
         RequestQueue queue = Volley.newRequestQueue(ctx);
 
         publickey = keyManager.getPublicKey().toString();
         String registerurl = "http://api.thesquare.me/v1/register";
         HashMap<String, String> params = new HashMap<String, String>();
 
-        params.put("name", username);
+        params.put("name", userModel.getUsername());
         HashMap<String, String> requestBody = new HashMap<String, String>();
 
         JSONObject parameters = new JSONObject(params);
@@ -59,9 +59,9 @@ public class ApiHandler {
                     String user = payloadObj.getString("user");
                     JSONObject userObj = new JSONObject(user);
                     String id = userObj.getString("id");
-                    String name = userObj.getString("name");
 
-                    callback.onSuccess(id, name);
+                    userModel.setId(id);
+                    callback.onSuccess(userModel);
                 }
                 catch(JSONException e)
                 {

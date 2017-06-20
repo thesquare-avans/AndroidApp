@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         listView.setAdapter(chatAdapter);
+        //test();
     }
 
     public void onPause() {
@@ -85,6 +86,18 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         checkPermissions();
     }
+//    private void test(){
+//        SharedPreferences pref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+//        String current_user = pref.getString("cur_user", null);
+//        KeyManager manager = new KeyManager();
+//        ApiHandler handler = new ApiHandler(manager);
+//        handler.chatService(current_user, this.getApplicationContext(), new VolleyCallback() {
+//            @Override
+//            public void onSuccess(String id, String name) {
+//
+//            }
+//        });
+//    }
 
     private void checkPermissions(){
         boolean[] perms = permissionHandler.checkPermissions();
@@ -114,20 +127,6 @@ public class MainActivity extends AppCompatActivity {
     public void onCaptureClick(View view) {
         if (!isStarted){
             stopWatch.setBase(SystemClock.elapsedRealtime());
-
-            KeyManager manager = new KeyManager();
-            ApiHandler handler = new ApiHandler(manager);
-
-            SharedPreferences pref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-            String current_user = pref.getString("cur_user", null);
-
-            handler.chatService(current_user, this.getApplicationContext(), new VolleyCallback() {
-                @Override
-                public void onSuccess(String id, String name) {
-
-                }
-            });
-          
             stopWatch.start();
             isStarted = true;
         }
