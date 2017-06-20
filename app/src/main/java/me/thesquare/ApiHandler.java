@@ -13,6 +13,12 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
 import me.thesquare.models.UserModel;
@@ -106,12 +112,14 @@ public class ApiHandler {
         queue.add(jsonRequest);
     }
 
-    public void chatService(String username, Context ctx, final VolleyCallback callback) {
+    public void chatService(String username, Context ctx, final VolleyCallback callback) throws InvalidKeySpecException {
         RequestQueue queue = Volley.newRequestQueue(ctx);
 
         RealmHandler handler = new RealmHandler();
         UserModel userChat = handler.getUser(username);
 
+        byte[] publicKeyByte = Base64.encode(user.getPublicKey(), 0);
+        publickey = new String(publicKeyByte);
         publickey = String.valueOf(userChat.getPublicKey());
         String registerURL = "http://api.thesquare.me/v1/streams";
         HashMap<String, String> params = new HashMap<>();
@@ -120,6 +128,16 @@ public class ApiHandler {
         HashMap<String, String> requestBody = new HashMap<>();
 
         JSONObject parameters = new JSONObject(params);
+        KeyFactory kf = null;
+        try {
+            kf = KeyFactory.getInstance("RSA");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        PrivateKey tempKey  = kf.generatePrivate(new X509EncodedKeySpec(user.getPrivateKey()));
+
+        keyManager.setPrivateKey(tempKey);
+        //keyManager.setPublicKey(kf.generatePublic(new X509EncodedKeySpec(user.getPublicKey())));
 
         String payload = parameters.toString();
         requestBody.put("payload", payload);
@@ -151,9 +169,6 @@ public class ApiHandler {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                if (error == null || error.networkResponse == null) {
-                    return;
-                }
 
                 try {
                     String message = new String(error.networkResponse.data,"UTF-8");
