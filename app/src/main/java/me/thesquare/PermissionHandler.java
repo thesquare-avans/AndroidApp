@@ -66,12 +66,10 @@ public class PermissionHandler implements PermissionListener {
 
 
     @Override public void onPermissionGranted(PermissionGrantedResponse response) {
-        permissionsActivity.showPermissionGranted(response.getPermissionName());
         checkPermissions();
     }
 
     @Override public void onPermissionDenied(PermissionDeniedResponse response) {
-        permissionsActivity.showPermissionDenied(response.getPermissionName(), response.isPermanentlyDenied());
         checkPermissions();
     }
 
