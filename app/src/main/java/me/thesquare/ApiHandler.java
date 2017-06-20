@@ -68,7 +68,7 @@ public class ApiHandler {
                 }
                 catch(JSONException e)
                 {
-                    e.getMessage();
+                    Log.d(TAG, e.getMessage());
                 }
                 if(keyManager.verifyResponse(response)) {
                     Log.d(TAG, "Signature valid");
@@ -83,10 +83,6 @@ public class ApiHandler {
                     return;
                 }
 
-                String body;
-                //get status code here
-                final String statusCode = String.valueOf(error.networkResponse.statusCode);
-                //get response body and parse with appropriate encoding
                 try {
                     String message = new String(error.networkResponse.data,"UTF-8");
                     Log.d(TAG, "Tags: " + message);
@@ -121,10 +117,17 @@ public class ApiHandler {
         RealmHandler handler = new RealmHandler();
         UserModel userChat = handler.getUser(username);
 
+<<<<<<< HEAD
         byte[] publicKeyByte = Base64.encode(userChat.getPublicKey(), 0);
         publickey = new String(publicKeyByte);
         publickey = String.valueOf(userChat.getPublicKey());
         String registerurl = "http://api.thesquare.me/v1/streams";
+=======
+        byte[] publicKeyByte = Base64.encode(user.getPublicKey(), 0);
+        publickey = new String(publicKeyByte);
+        publickey = String.valueOf(userChat.getPublicKey());
+        String registerURL = "http://api.thesquare.me/v1/streams";
+>>>>>>> 3f96e0b06f0f9460753d78f71760591ace71d181
         HashMap<String, String> params = new HashMap<>();
 
         params.put("name", username);
@@ -147,7 +150,7 @@ public class ApiHandler {
         requestBody.put("signature", keyManager.signMessage(payload));
 
 
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, registerurl, new JSONObject(requestBody), new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, registerURL, new JSONObject(requestBody), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -173,10 +176,6 @@ public class ApiHandler {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                String body;
-                //get status code here
-                final String statusCode = String.valueOf(error.networkResponse.statusCode);
-                //get response body and parse with appropriate encoding
                 try {
                     String message = new String(error.networkResponse.data,"UTF-8");
                     Log.d(TAG, "Tags: " + message);
@@ -193,7 +192,7 @@ public class ApiHandler {
                 try {
                     key = Base64.encodeToString(keyManager.getPublicKeyPem().getBytes("UTF-8"), Base64.NO_WRAP);
                 } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+                    Log.d(TAG, e.getMessage());
                 }
                 //String pubkey = new String(key);
                 headers.put("Content-Type", "application/json");
