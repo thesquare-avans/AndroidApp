@@ -1,7 +1,6 @@
 package me.thesquare;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -19,13 +18,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.realm.Realm;
-import io.realm.RealmResults;
-import me.thesquare.models.UserModel;
-
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+    private static final String SERVER_IP = "145.49.13.101";
     private Recorder recorder;
     private EditText chatInput;
     private FSDClient fsdClient;
@@ -56,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         try {
-            Socket serverConnection = new Socket("145.49.13.101", 1234);
+            Socket serverConnection = new Socket(SERVER_IP, 1234);
             fsdClient = new FSDClient(null, serverConnection.getOutputStream());
         } catch (IOException e) {
             Log.d(TAG, e.getMessage());
@@ -110,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         ChatItem addChat = new ChatItem();
         addChat.setChatname("You");
         if(chatInput.getText().toString().equals("")){
-            Toast.makeText(this, "You did not enter a valid message", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.no_valid_message), Toast.LENGTH_SHORT).show();
         } else {
             addChat.setChattext(chatInput.getText().toString());
             chat.add(addChat);
@@ -130,10 +126,8 @@ public class MainActivity extends AppCompatActivity {
             stopWatch.start();
             isStarted = true;
         }
-        if (recorder.getRecordingState()) {
-            Log.d(TAG, "Already recording");
-        } else {
-            recorder.start();
+        else {
+            Toast.makeText(this, getString(R.string.no_connection), Toast.LENGTH_SHORT).show();
         }
     }
 

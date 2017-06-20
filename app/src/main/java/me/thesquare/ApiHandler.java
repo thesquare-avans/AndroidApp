@@ -15,9 +15,6 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
-import io.realm.Realm;
-import me.thesquare.models.PayloadModel;
-import me.thesquare.models.ResponseModel;
 import me.thesquare.models.UserModel;
 
 /**
@@ -25,7 +22,7 @@ import me.thesquare.models.UserModel;
  */
 
 public class ApiHandler {
-    private UserModel user;
+    private UserModel userModel;
     private KeyManager keyManager;
     private String  publickey;
 
@@ -38,7 +35,7 @@ public class ApiHandler {
 
         publickey = keyManager.getPublicKey().toString();
         String registerurl = "http://api.thesquare.me/v1/register";
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
 
         params.put("name", userModel.getUsername());
         HashMap<String, String> requestBody = new HashMap<String, String>();
@@ -94,7 +91,7 @@ public class ApiHandler {
         }){
             @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
-                    HashMap<String, String> headers = new HashMap<String, String>();
+                    HashMap<String, String> headers = new HashMap<>();
 
                     String key = null;
                     try {
@@ -116,14 +113,14 @@ public class ApiHandler {
         RequestQueue queue = Volley.newRequestQueue(ctx);
 
         RealmHandler handler = new RealmHandler();
-        UserModel user = handler.getUser(username);
+        UserModel userChat = handler.getUser(username);
 
-        publickey = String.valueOf(user.getPublicKey());
+        publickey = String.valueOf(userChat.getPublicKey());
         String registerurl = "http://api.thesquare.me/v1/streams";
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
 
         params.put("name", username);
-        HashMap<String, String> requestBody = new HashMap<String, String>();
+        HashMap<String, String> requestBody = new HashMap<>();
 
         JSONObject parameters = new JSONObject(params);
 
@@ -175,7 +172,7 @@ public class ApiHandler {
         }){
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
 
                 String key = null;
                 try {
@@ -195,8 +192,8 @@ public class ApiHandler {
     }
 
     public Map<String, String> getHeaders() throws AuthFailureError {
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("X-PublicKey", user.getPublicKey().toString());
+        Map<String, String> params = new HashMap<>();
+        params.put("X-PublicKey", userModel.getPublicKey().toString());
         params.put("Content-Type", "application/json; charset=utf-8");
 
         return params;
