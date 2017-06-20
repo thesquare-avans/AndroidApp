@@ -13,8 +13,18 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
+
+import me.thesquare.ApiResponses.RegisterResponse;
+import me.thesquare.ApiResponses.StreamResponse;
+import me.thesquare.ApiResponses.UserResponse;
+import me.thesquare.models.StreamModel;
 import me.thesquare.models.UserModel;
 
 /**
@@ -22,139 +32,80 @@ import me.thesquare.models.UserModel;
  */
 
 public class ApiHandler {
-    private UserModel userModel;
     private KeyManager keyManager;
-    private String  publickey;
+    private String apiHost = "http://api.thesquare.me" ;
+    private Context ctx;
 
-    public ApiHandler(KeyManager keyManager) {
+    public ApiHandler(KeyManager keyManager,Context ctx) {
         this.keyManager = keyManager;
+        this.ctx = ctx;
     }
 
-    public void register(final UserModel userModel, Context ctx, final VolleyCallback callback) {
+    private void request(int method, String endPoint, JSONObject body, final ApiResponse callback)
+    {
         RequestQueue queue = Volley.newRequestQueue(ctx);
 
-        publickey = keyManager.getPublicKey().toString();
-        String registerurl = "http://api.thesquare.me/v1/register";
-        HashMap<String, String> params = new HashMap<>();
+        JSONObject requestBodyJSON = null;
 
-        params.put("name", userModel.getUsername());
-        HashMap<String, String> requestBody = new HashMap<String, String>();
+        if(body != null) {
+            String payload = body.toString();
 
-        JSONObject parameters = new JSONObject(params);
+            HashMap<String, String> requestBody = new HashMap<String, String>();
+            requestBody.put("payload", payload);
+            requestBody.put("signature", keyManager.signMessage(payload));
 
-        String payload = parameters.toString();
-        requestBody.put("payload", payload);
-        requestBody.put("signature", keyManager.signMessage(payload));
+            requestBodyJSON = new JSONObject(requestBody);
+        }
 
-
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, registerurl, new JSONObject(requestBody), new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(method, (apiHost+endPoint), requestBodyJSON, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    String payload = response.getString("payload");
-                    JSONObject payloadObj = new JSONObject(payload);
-                    String user = payloadObj.getString("user");
-                    JSONObject userObj = new JSONObject(user);
-                    String id = userObj.getString("id");
-
-                    userModel.setId(id);
-                    callback.onSuccess(userModel);
-                }
-                catch(JSONException e)
-                {
-                    e.getMessage();
-                }
-                if(keyManager.verifyResponse(response)) {
-                    Log.d("TheSquare", "Signature valid");
-                }else{
-                    Log.d("TheSquare", "Signature invalid");
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                if (error == null || error.networkResponse == null) {
-                    return;
-                }
-
-                String body;
-                //get status code here
-                final String statusCode = String.valueOf(error.networkResponse.statusCode);
-                //get response body and parse with appropriate encoding
-                try {
-                    String message = new String(error.networkResponse.data,"UTF-8");
-                    Log.d("tags",message);
-                } catch (UnsupportedEncodingException e) {
-                    // exception
-                }
-            }
-        }){
-            @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    HashMap<String, String> headers = new HashMap<>();
-
-                    String key = null;
-                    try {
-                        key = Base64.encodeToString(keyManager.getPublicKeyPem().getBytes("UTF-8"), Base64.NO_WRAP);
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
+                    if(!keyManager.verifyResponse(response)) {
+                        JSONObject invalidSignature = new JSONObject();
+                        invalidSignature.put("success", false);
+                        invalidSignature.put("error", new JSONObject().put("code", "invalidResponseSignature"));
+                        callback.on(false, invalidSignature);
+                        return;
                     }
-                    //String pubkey = new String(key);
-                    headers.put("Content-Type", "application/json");
-                    headers.put("X-PublicKey", key);
-                    return headers;
-            }
-        };
 
-        queue.add(jsonRequest);
-    }
-
-    public void chatService(String username, Context ctx, final VolleyCallback callback) {
-        RequestQueue queue = Volley.newRequestQueue(ctx);
-
-        RealmHandler handler = new RealmHandler();
-        UserModel userChat = handler.getUser(username);
-
-        publickey = String.valueOf(userChat.getPublicKey());
-        String registerurl = "http://api.thesquare.me/v1/streams";
-        HashMap<String, String> params = new HashMap<>();
-
-        params.put("name", username);
-        HashMap<String, String> requestBody = new HashMap<>();
-
-        JSONObject parameters = new JSONObject(params);
-
-        String payload = parameters.toString();
-        requestBody.put("payload", payload);
-        requestBody.put("signature", keyManager.signMessage(payload));
-
-
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, registerurl, new JSONObject(requestBody), new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
                     String payload = response.getString("payload");
                     JSONObject payloadObj = new JSONObject(payload);
 
+                    if(!payloadObj.getBoolean("success")) {
+                        callback.on(false, payloadObj);
+                        return;
+                    }
 
-                    Log.d("Response", payload);
-
-                 //   callback.onSuccess(id, name);
+                    callback.on(true, payloadObj);
                 }
-                catch(Exception e)
-                {
+                catch(JSONException e) {
                     e.getMessage();
-                }
-                if(keyManager.verifyResponse(response)) {
-                    Log.d("TheSquare", "Signature valid");
-                }else{
-                    Log.d("TheSquare", "Signature invalid");
+
+                    try {
+                        JSONObject invalidResponse = new JSONObject();
+                        invalidResponse.put("success", false);
+                        invalidResponse.put("error", new JSONObject().put("code", "invalidResponseSignature"));
+                        callback.on(false, invalidResponse);
+                        return;
+                    } catch(JSONException err) {
+                        err.getMessage();
+                    }
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 if (error == null || error.networkResponse == null) {
+                    try {
+                        JSONObject invalidResponse = new JSONObject();
+                        invalidResponse.put("success", false);
+                        invalidResponse.put("error", new JSONObject().put("code", "invalidOrNoResponse"));
+                        callback.on(false, invalidResponse);
+                        return;
+                    } catch(JSONException err) {
+                        err.getMessage();
+                    }
                     return;
                 }
 
@@ -163,10 +114,37 @@ public class ApiHandler {
                 final String statusCode = String.valueOf(error.networkResponse.statusCode);
                 //get response body and parse with appropriate encoding
                 try {
-                    String message = new String(error.networkResponse.data,"UTF-8");
-                    Log.d("tags",message);
+                    JSONObject response = new JSONObject(new String(error.networkResponse.data,"UTF-8"));
+
+                    if(!keyManager.verifyResponse(response)) {
+                        JSONObject invalidSignature = new JSONObject();
+                        invalidSignature.put("success", false);
+                        invalidSignature.put("error", new JSONObject().put("code", "invalidResponseSignature"));
+                        callback.on(false, invalidSignature);
+                        return;
+                    }
+
+                    String payload = response.getString("payload");
+                    JSONObject payloadObj = new JSONObject(payload);
+
+                    if(!payloadObj.getBoolean("success")) {
+                        callback.on(false, payloadObj);
+                        return;
+                    }
+
+                    callback.on(true, payloadObj);
                 } catch (UnsupportedEncodingException e) {
                     // exception
+                } catch (JSONException e) {
+                    try {
+                        JSONObject invalidResponse = new JSONObject();
+                        invalidResponse.put("success", false);
+                        invalidResponse.put("error", new JSONObject().put("code", "invalidOrNoResponse"));
+                        callback.on(false, invalidResponse);
+                        return;
+                    } catch(JSONException err) {
+                        err.getMessage();
+                    }
                 }
             }
         }){
@@ -176,26 +154,124 @@ public class ApiHandler {
 
                 String key = null;
                 try {
-                    key = Base64.encodeToString(keyManager.getPublicKeyPem().getBytes("UTF-8"), Base64.NO_WRAP);
+                    String pemKey = keyManager.getPublicKeyPem();
+                    key = "";
+                    if(pemKey != null) {
+                        key = Base64.encodeToString(pemKey.getBytes("UTF-8"), Base64.NO_WRAP);
+                    }
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
                 //String pubkey = new String(key);
-                headers.put("Content-Type", "application/json");
+                headers.put("Content-Type", "application/json; charset=utf-8");
                 headers.put("X-PublicKey", key);
                 return headers;
             }
         };
 
         queue.add(jsonRequest);
-
     }
 
-    public Map<String, String> getHeaders() throws AuthFailureError {
-        Map<String, String> params = new HashMap<>();
-        params.put("X-PublicKey", userModel.getPublicKey().toString());
-        params.put("Content-Type", "application/json; charset=utf-8");
+    public void register(final UserModel userModel, final RegisterResponse callback) {
+        HashMap<String, String> params = new HashMap<>();
 
-        return params;
+        params.put("name", userModel.getUsername());
+        HashMap<String, String> requestBody = new HashMap<String, String>();
+
+        JSONObject parameters = new JSONObject(params);
+
+        request(Request.Method.POST, "/v1/register", parameters, new ApiResponse(){
+            @Override
+            public void on(boolean success, JSONObject data) {
+                if(success) {
+                    try {
+                        String user = data.getString("user");
+                        JSONObject userObj = new JSONObject(user);
+                        String id = userObj.getString("id");
+
+                        userModel.setId(id);
+                        callback.on();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    return;
+                }
+
+                Log.d("API ERROR", "api not successful");
+                try {
+                    Log.d("API ERROR", data.getJSONObject("error").toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
+
+    public void startStream(String title, final StreamResponse callback) {
+        HashMap<String, String> params = new HashMap<>();
+
+        params.put("title", title);
+        HashMap<String, String> requestBody = new HashMap<String, String>();
+
+        JSONObject parameters = new JSONObject(params);
+
+        request(Request.Method.POST, "/v1/streams", parameters, new ApiResponse(){
+            @Override
+            public void on(boolean success, JSONObject data) {
+                if(success) {
+                    try {
+                        StreamModel stream = new StreamModel();
+                        JSONObject streamData = data.getJSONObject("stream");
+                        stream.setId(streamData.getString("id"));
+                        stream.setTitle(streamData.getString("title"));
+
+                        callback.on(stream);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    return;
+                }
+
+                Log.d("API ERROR", "api not successful\n"+data.toString());
+            }
+        });
+    }
+
+    public void getLoggedInUser(final UserResponse callback) {
+        HashMap<String, String> params = new HashMap<>();
+
+        request(Request.Method.GET, "/v1/me", null, new ApiResponse(){
+            @Override
+            public void on(boolean success, JSONObject data) {
+                if(success) {
+                    try {
+                        UserModel user = new UserModel();
+                        JSONObject userData = data.getJSONObject("user");
+                        user.setId(userData.getString("id"));
+                        // TODO: zet alle velden die je terug krijgt van de API en je lokaal opslaat
+
+                        callback.on(user);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    return;
+                }
+
+                try {
+                    if (data.getJSONObject("error").getString("code") == "userNotFound") {
+                        callback.on(null);
+                        return;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                Log.d("API ERROR", "api not successful\n"+data.toString());
+            }
+        });
+    }
+
 }

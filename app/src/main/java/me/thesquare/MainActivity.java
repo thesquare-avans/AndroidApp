@@ -15,8 +15,14 @@ import android.widget.ListView;
 import android.widget.Toast;
 import java.io.IOException;
 import java.net.Socket;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.realm.Realm;
+import me.thesquare.ApiResponses.StreamResponse;
+import me.thesquare.models.StreamModel;
+import me.thesquare.models.UserModel;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -68,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         listView.setAdapter(chatAdapter);
-        //test();
+        test();
     }
 
     public void onPause() {
@@ -82,18 +88,22 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         checkPermissions();
     }
-//    private void test(){
-//        SharedPreferences pref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-//        String current_user = pref.getString("cur_user", null);
-//        KeyManager manager = new KeyManager();
-//        ApiHandler handler = new ApiHandler(manager);
-//        handler.chatService(current_user, this.getApplicationContext(), new VolleyCallback() {
-//            @Override
-//            public void onSuccess(String id, String name) {
-//
-//            }
-//        });
-//    }
+    private void test(){
+        SharedPreferences pref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        String current_user = pref.getString("cur_user", null);
+        Realm realm = Realm.getDefaultInstance();
+
+        KeyManager manager = ((TheSquareApplication) this.getApplication()).keyManager;
+        ApiHandler handler = new ApiHandler(manager, this);
+
+        handler.startStream("Stream 1", new StreamResponse() {
+            @Override
+            public void on(StreamModel streamModel) {
+                Log.e(TAG,"wholla");
+                Log.e(TAG, streamModel.toString());
+            }
+        });
+    }
 
     private void checkPermissions(){
         boolean[] perms = permissionHandler.checkPermissions();
@@ -106,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         ChatItem addChat = new ChatItem();
         addChat.setChatname("You");
         if(chatInput.getText().toString().equals("")){
-            Toast.makeText(this, getString(R.string.no_valid_message), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "test", Toast.LENGTH_SHORT).show();
         } else {
             addChat.setChattext(chatInput.getText().toString());
             chat.add(addChat);
@@ -127,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
             isStarted = true;
         }
         else {
-            Toast.makeText(this, getString(R.string.no_connection), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "test", Toast.LENGTH_SHORT).show();
         }
     }
 

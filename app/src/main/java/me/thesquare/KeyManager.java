@@ -47,6 +47,21 @@ public class KeyManager {
     private PublicKey serverPublicKey;
     private String publicKeyPem;
 
+    public KeyManager() {
+        try {
+            PemReader pemReader = new PemReader(new StringReader(this.serverPublicKeyPem));
+            PemObject pemObject = pemReader.readPemObject();
+
+            KeyFactory kf = KeyFactory.getInstance("RSA", "BC");
+            byte[] publicKeyContent = pemObject.getContent();
+
+            X509EncodedKeySpec spec = new X509EncodedKeySpec(publicKeyContent);
+            this.serverPublicKey = kf.generatePublic(spec);
+        } catch (NoSuchAlgorithmException | IOException | NoSuchProviderException | InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void generateKey() {
         try {
@@ -64,17 +79,8 @@ public class KeyManager {
             pemWriter.flush();
             pemWriter.close();
             this.publicKeyPem = writer.toString();
-
-            PemReader pemReader = new PemReader(new StringReader(this.serverPublicKeyPem));
-            PemObject pemObject = pemReader.readPemObject();
-
-            KeyFactory kf = KeyFactory.getInstance("RSA", "BC");
-            byte[] publicKeyContent = pemObject.getContent();
-
-            X509EncodedKeySpec spec = new X509EncodedKeySpec(publicKeyContent);
-            this.serverPublicKey = kf.generatePublic(spec);
         }
-        catch (NoSuchAlgorithmException | IOException | NoSuchProviderException | InvalidKeySpecException e) {
+        catch (NoSuchAlgorithmException | IOException e) {
             Log.d(TAG, e.getMessage());
         }
     }
@@ -153,7 +159,7 @@ public class KeyManager {
     public String signMessage(String message) {
         try {
             sig = Signature.getInstance("SHA256withRSA");
-            sig.initSign(this.privateKey);
+            sig.initSign(getPrivateKey());
             sig.update(message.getBytes("UTF-8"));
 
             return bytesToHex(sig.sign());
@@ -164,5 +170,16 @@ public class KeyManager {
         return null;
     }
 
+    public void setPublicKey(PublicKey publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public void setPublicKeyPem(String publicKeyPem) {
+        this.publicKeyPem = publicKeyPem;
+    }
+
+    public void setPrivateKey(PrivateKey privateKey) {
+        this.privateKey = privateKey;
+    }
 }
 

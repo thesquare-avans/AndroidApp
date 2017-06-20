@@ -14,8 +14,28 @@ public class UserModel extends RealmObject {
     private String id;
     private String username;
     private byte[] privateKey, publicKey;
+    private String publicKeyPem;
+
+    private int satoshi;
+
+    public int getSatoshi() {
+        return satoshi;
+    }
+
+    public void setSatoshi(int satoshi) {
+        this.satoshi = satoshi;
+    }
+
+    public String getPublicKeyPem() {
+        return publicKeyPem;
+    }
+
+    public void setPublicKeyPem(String publicKeyPem) {
+        this.publicKeyPem = publicKeyPem;
+    }
 
     public UserModel() {
+        this.satoshi = 0;
     }
 
     public void setId(String id) {

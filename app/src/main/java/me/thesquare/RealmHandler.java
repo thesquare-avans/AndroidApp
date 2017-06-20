@@ -1,5 +1,7 @@
 package me.thesquare;
 
+import android.util.Log;
+
 import java.util.List;
 
 import io.realm.Realm;
@@ -18,10 +20,9 @@ public class RealmHandler {
     }
 
     public UserModel getUser(String username){
-        RealmResults<UserModel> result = realm.where( UserModel.class ).equalTo( "username", username ).findAll();
+        RealmResults<UserModel> result = realm.where( UserModel.class ).equalTo( "username", username).findAll();
         List<UserModel> user = realm.copyFromRealm(result);
         UserModel userModel = user.get(0);
-
         return userModel;
     }
 }

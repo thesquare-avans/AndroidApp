@@ -13,6 +13,7 @@
     <permission-group android:name="android.permission-group.MICROPHONE"/>
 
     <application
+        android:name=".TheSquareApplication"
         android:windowSoftInputMode="stateHidden"
         android:allowBackup="true"
         android:icon="@drawable/logo"
