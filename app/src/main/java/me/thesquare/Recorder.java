@@ -36,6 +36,7 @@ public class Recorder implements Runnable {
         this.mMediaRecorder = new MediaRecorder();
         this.tmpFile = File.createTempFile("the_square_tmp_video", ".tmp");
         this.outputFile = new RandomAccessFile(tmpFile, "rw");
+
     }
 
     public void releaseMediaRecorder(){

@@ -81,48 +81,25 @@ public class LoginActivity extends AppCompatActivity {
         if ( result.isEmpty() && !username.equals("") ) {
             keyManager = new KeyManager();
             keyManager.generateKey();
-            UserModel user = new UserModel();
+            final UserModel user = new UserModel();
             // Set the user ID from the API response
             user.setId("");
             user.setUsername( txtUsername.getText().toString() );
             user.setPrivateKey( keyManager.getPrivateKey().getEncoded() );
             user.setPublicKey( keyManager.getPublicKey().getEncoded() );
             apihandler = new ApiHandler(keyManager);
-            apihandler.register(txtUsername.getText().toString(), this, new VolleyCallback(){
+            apihandler.register(user, this, new VolleyCallback(){
                 @Override
-                public void onSuccess(String id, String name){
+                public void onSuccess(UserModel userModel){
                     Realm realm = Realm.getDefaultInstance();
-                    RealmResults<UserModel> result = realm.where( UserModel.class ).equalTo( "username", name ).findAll();
-                    List<UserModel> user = realm.copyFromRealm(result);
-                    UserModel userModel = user.get(0);
+                    realm.beginTransaction();
+                    realm.insertOrUpdate(userModel);
+                    realm.commitTransaction();
 
-                    userModel.setId(id);
-
-                    if(!result.isEmpty()){
-                        realm.beginTransaction();
-                        //Hier gaat iets mis
-                        realm.insertOrUpdate(userModel);
-
-                        realm.commitTransaction();
-                        Toast.makeText(LoginActivity.this,
-                                "Gebruiker: " + userModel.getUsername() + " toegevoegd!", Toast.LENGTH_SHORT).show();
-
-                    } else {
-                        Toast.makeText(LoginActivity.this,
-                                "Gebruiker bestaat al. Probeer het nog een keer met een andere gebruikersnaam.", Toast.LENGTH_SHORT).show();
-
-                    }
+                    Toast.makeText(LoginActivity.this, "Gebruiker: " + userModel.getUsername() + " toegevoegd!", Toast.LENGTH_SHORT).show();
                     finish();
                 }
             });
-
-
-            /*
-              transaction to the database to update a player
-            */
-            realm.beginTransaction();
-            realm.copyToRealmOrUpdate(user);
-            realm.commitTransaction();
 
             addToSharedPref(user);
         }

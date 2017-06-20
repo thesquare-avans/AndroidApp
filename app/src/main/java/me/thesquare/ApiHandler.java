@@ -21,9 +21,6 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
-import io.realm.Realm;
-import me.thesquare.models.PayloadModel;
-import me.thesquare.models.ResponseModel;
 import me.thesquare.models.UserModel;
 
 /**
@@ -31,23 +28,24 @@ import me.thesquare.models.UserModel;
  */
 
 public class ApiHandler {
-    private UserModel user;
+    private static final String TAG = "APIHandler";
+    private UserModel userModel;
     private KeyManager keyManager;
-    private String username, publickey;
+    private String publickey;
 
     public ApiHandler(KeyManager keyManager) {
         this.keyManager = keyManager;
     }
 
-    public void register(String username, Context ctx, final VolleyCallback callback) {
+    public void register(final UserModel userModel, Context ctx, final VolleyCallback callback) {
         RequestQueue queue = Volley.newRequestQueue(ctx);
 
         publickey = keyManager.getPublicKey().toString();
         String registerurl = "http://api.thesquare.me/v1/register";
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
 
-        params.put("name", username);
-        HashMap<String, String> requestBody = new HashMap<String, String>();
+        params.put("name", userModel.getUsername());
+        HashMap<String, String> requestBody = new HashMap<>();
 
         JSONObject parameters = new JSONObject(params);
 
@@ -65,18 +63,18 @@ public class ApiHandler {
                     String user = payloadObj.getString("user");
                     JSONObject userObj = new JSONObject(user);
                     String id = userObj.getString("id");
-                    String name = userObj.getString("name");
 
-                    callback.onSuccess(id, name);
+                    userModel.setId(id);
+                    callback.onSuccess(userModel);
                 }
                 catch(JSONException e)
                 {
                     e.getMessage();
                 }
                 if(keyManager.verifyResponse(response)) {
-                    Log.d("TheSquare", "Signature valid");
+                    Log.d(TAG, "Signature valid");
                 }else{
-                    Log.d("TheSquare", "Signature invalid");
+                    Log.d(TAG, "Signature invalid");
                 }
             }
         }, new Response.ErrorListener() {
@@ -92,21 +90,21 @@ public class ApiHandler {
                 //get response body and parse with appropriate encoding
                 try {
                     String message = new String(error.networkResponse.data,"UTF-8");
-                    Log.d("tags",message);
+                    Log.d(TAG, "Tags: " + message);
                 } catch (UnsupportedEncodingException e) {
-                    // exception
+                    Log.d(TAG, e.getMessage());
                 }
             }
         }){
             @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
-                    HashMap<String, String> headers = new HashMap<String, String>();
+                    HashMap<String, String> headers = new HashMap<>();
 
                     String key = null;
                     try {
                         key = Base64.encodeToString(keyManager.getPublicKeyPem().getBytes("UTF-8"), Base64.NO_WRAP);
                     } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
+                        Log.d(TAG, e.getMessage());
                     }
                     //String pubkey = new String(key);
                     headers.put("Content-Type", "application/json");
@@ -122,15 +120,19 @@ public class ApiHandler {
         RequestQueue queue = Volley.newRequestQueue(ctx);
 
         RealmHandler handler = new RealmHandler();
-        UserModel user = handler.getUser(username);
+        UserModel userChat = handler.getUser(username);
 
+<<<<<<< HEAD
         byte[] publicKeyByte = Base64.encode(user.getPublicKey(), 0);
         publickey = new String(publicKeyByte);
+=======
+        publickey = String.valueOf(userChat.getPublicKey());
+>>>>>>> origin/Develop
         String registerurl = "http://api.thesquare.me/v1/streams";
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
 
         params.put("name", username);
-        HashMap<String, String> requestBody = new HashMap<String, String>();
+        HashMap<String, String> requestBody = new HashMap<>();
 
         JSONObject parameters = new JSONObject(params);
         KeyFactory kf = null;
@@ -157,18 +159,18 @@ public class ApiHandler {
                     JSONObject payloadObj = new JSONObject(payload);
 
 
-                    Log.d("Response", payload);
+                    Log.d(TAG, "Response: " + payload);
 
                  //   callback.onSuccess(id, name);
                 }
                 catch(Exception e)
                 {
-                    e.getMessage();
+                    Log.d(TAG, e.getMessage());
                 }
                 if(keyManager.verifyResponse(response)) {
-                    Log.d("TheSquare", "Signature valid");
+                    Log.d(TAG, "Signature valid");
                 }else{
-                    Log.d("TheSquare", "Signature invalid");
+                    Log.d(TAG, "Signature invalid");
                 }
             }
         }, new Response.ErrorListener() {
@@ -181,15 +183,15 @@ public class ApiHandler {
                 //get response body and parse with appropriate encoding
                 try {
                     String message = new String(error.networkResponse.data,"UTF-8");
-                    Log.d("tags",message);
+                    Log.d(TAG, "Tags: " + message);
                 } catch (UnsupportedEncodingException e) {
-                    // exception
+                    Log.d(TAG, e.getMessage());
                 }
             }
         }){
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
 
                 String key = null;
                 try {
@@ -209,8 +211,8 @@ public class ApiHandler {
     }
 
     public Map<String, String> getHeaders() throws AuthFailureError {
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("X-PublicKey", user.getPublicKey().toString());
+        Map<String, String> params = new HashMap<>();
+        params.put("X-PublicKey", userModel.getPublicKey().toString());
         params.put("Content-Type", "application/json; charset=utf-8");
 
         return params;
