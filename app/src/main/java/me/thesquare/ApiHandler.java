@@ -22,9 +22,10 @@ import me.thesquare.models.UserModel;
  */
 
 public class ApiHandler {
+    private static final String TAG = "APIHandler";
     private UserModel userModel;
     private KeyManager keyManager;
-    private String  publickey;
+    private String publickey;
 
     public ApiHandler(KeyManager keyManager) {
         this.keyManager = keyManager;
@@ -38,7 +39,7 @@ public class ApiHandler {
         HashMap<String, String> params = new HashMap<>();
 
         params.put("name", userModel.getUsername());
-        HashMap<String, String> requestBody = new HashMap<String, String>();
+        HashMap<String, String> requestBody = new HashMap<>();
 
         JSONObject parameters = new JSONObject(params);
 
@@ -65,9 +66,9 @@ public class ApiHandler {
                     e.getMessage();
                 }
                 if(keyManager.verifyResponse(response)) {
-                    Log.d("TheSquare", "Signature valid");
+                    Log.d(TAG, "Signature valid");
                 }else{
-                    Log.d("TheSquare", "Signature invalid");
+                    Log.d(TAG, "Signature invalid");
                 }
             }
         }, new Response.ErrorListener() {
@@ -83,9 +84,9 @@ public class ApiHandler {
                 //get response body and parse with appropriate encoding
                 try {
                     String message = new String(error.networkResponse.data,"UTF-8");
-                    Log.d("tags",message);
+                    Log.d(TAG, "Tags: " + message);
                 } catch (UnsupportedEncodingException e) {
-                    // exception
+                    Log.d(TAG, e.getMessage());
                 }
             }
         }){
@@ -97,7 +98,7 @@ public class ApiHandler {
                     try {
                         key = Base64.encodeToString(keyManager.getPublicKeyPem().getBytes("UTF-8"), Base64.NO_WRAP);
                     } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
+                        Log.d(TAG, e.getMessage());
                     }
                     //String pubkey = new String(key);
                     headers.put("Content-Type", "application/json");
@@ -137,18 +138,18 @@ public class ApiHandler {
                     JSONObject payloadObj = new JSONObject(payload);
 
 
-                    Log.d("Response", payload);
+                    Log.d(TAG, "Response: " + payload);
 
                  //   callback.onSuccess(id, name);
                 }
                 catch(Exception e)
                 {
-                    e.getMessage();
+                    Log.d(TAG, e.getMessage());
                 }
                 if(keyManager.verifyResponse(response)) {
-                    Log.d("TheSquare", "Signature valid");
+                    Log.d(TAG, "Signature valid");
                 }else{
-                    Log.d("TheSquare", "Signature invalid");
+                    Log.d(TAG, "Signature invalid");
                 }
             }
         }, new Response.ErrorListener() {
@@ -164,9 +165,9 @@ public class ApiHandler {
                 //get response body and parse with appropriate encoding
                 try {
                     String message = new String(error.networkResponse.data,"UTF-8");
-                    Log.d("tags",message);
+                    Log.d(TAG, "Tags: " + message);
                 } catch (UnsupportedEncodingException e) {
-                    // exception
+                    Log.d(TAG, e.getMessage());
                 }
             }
         }){
