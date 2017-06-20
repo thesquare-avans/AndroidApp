@@ -1,5 +1,7 @@
 package me.thesquare;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -19,9 +21,8 @@ import java.util.Arrays;
  */
 
 public class FSDClient implements FragmentWriter {
-    //The signature
+    private static final String TAG = "FSDClient";
     private PrivateKey privateKey;
-    //The socket to output to
     private OutputStream outputStream;
 
     public FSDClient(PrivateKey privateKey, OutputStream outputStream){
@@ -47,7 +48,7 @@ public class FSDClient implements FragmentWriter {
                 outputStream.write(fragment);
 
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.d(TAG, e.getMessage());
             }
     }
 
