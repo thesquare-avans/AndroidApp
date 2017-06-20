@@ -34,7 +34,7 @@ import me.thesquare.models.UserModel;
 public class ApiHandler {
     private static final String TAG = "APIHandler";
     private static final String API_TAG = "API ERROR";
-    private static final String apiHost = "http://api.thesquare.me" ;
+    private static final String API_HOST = "http://api.thesquare.me" ;
     private UserModel userModel;
     private KeyManager keyManager;
     private Context ctx;
@@ -60,7 +60,7 @@ public class ApiHandler {
             requestBodyJSON = new JSONObject(requestBody);
         }
 
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(method, (apiHost+endPoint), requestBodyJSON, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(method, (API_HOST +endPoint), requestBodyJSON, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
