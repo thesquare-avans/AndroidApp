@@ -16,7 +16,7 @@ import static java.lang.Thread.sleep;
  */
 
 public class Recorder implements Runnable {
-    private static final String TAG = "Record class";
+    private static final String TAG = "Recorder";
     private static final int CAPTURE_TIME = 5000;
 
     private Camera mCamera;
@@ -72,7 +72,7 @@ public class Recorder implements Runnable {
             mCamera = CameraHelper.getDefaultCameraInstance();
         }
         catch (Exception e){
-            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
         }
         if (mCamera == null){
             mCamera = CameraHelper.getDefaultBackFacingCameraInstance();
@@ -106,7 +106,7 @@ public class Recorder implements Runnable {
             mCamera.setPreviewTexture(mPreview.getSurfaceTexture());
             mCamera.setDisplayOrientation(90);
         } catch (IOException e) {
-            Log.e(TAG, "Surface texture is unavailable or unsuitable" + e.getMessage());
+            Log.d(TAG, "Surface texture is unavailable or unsuitable" + e.getMessage());
             return false;
         }
         // END_INCLUDE (configure_preview)
@@ -130,7 +130,7 @@ public class Recorder implements Runnable {
         try {
             mMediaRecorder.setOutputFile(outputFile.getFD());
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
         }
         // END_INCLUDE (configure_media_recorder)
 
@@ -175,16 +175,16 @@ public class Recorder implements Runnable {
         try {
             for (;;) {
                 prepareVideoRecorder();
-                Log.i("Recorder", "Start capture");
+                Log.d(TAG, "Start capture");
                 mMediaRecorder.start();
                 sleep(CAPTURE_TIME);
 
                 mMediaRecorder.stop();
 
-                Log.i("Recorder", "Stop capture");
+                Log.d(TAG, "Stop capture");
 
                 byte[] buffer = new byte[(int) outputFile.length()];
-                Log.i("Recorder", "outputFile length: " + outputFile.length());
+                Log.d(TAG, "outputFile length: " + outputFile.length());
                 outputFile.seek(0);
                 outputFile.read(buffer);
                 writer.writeFragment(buffer);
@@ -197,7 +197,7 @@ public class Recorder implements Runnable {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
         }
     }
 }

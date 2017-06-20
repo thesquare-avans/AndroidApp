@@ -73,6 +73,23 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, e.getMessage());
         }
 
+        KeyManager manager = new KeyManager();
+        ApiHandler handler = new ApiHandler(manager);
+
+        SharedPreferences pref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        String current_user = pref.getString("cur_user", null);
+
+        try {
+            handler.chatService(current_user, this.getApplicationContext(), new VolleyCallback() {
+                @Override
+                public void onSuccess(UserModel user) {
+
+                }
+            });
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+
         listView.setAdapter(chatAdapter);
         test();
     }
@@ -133,6 +150,8 @@ public class MainActivity extends AppCompatActivity {
     public void onCaptureClick(View view) {
         if (!isStarted){
             stopWatch.setBase(SystemClock.elapsedRealtime());
+
+
             stopWatch.start();
             isStarted = true;
         }

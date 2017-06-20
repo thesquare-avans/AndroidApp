@@ -33,10 +33,9 @@ public class PermissionsActivity extends Activity {
     private ViewGroup rootView;
 
     private static final String TAG = "Permission Activity";
-    private SwitchIconView cameraIconView, micIconView;
+    private SwitchIconView cameraIconView;
+    private SwitchIconView micIconView;
     private PermissionHandler permissionHandler;
-    private PermissionListener dialogOnDeniedPermissionListener;
-    private boolean micPerm = false, camPerm = false;
     private PermissionListener cameraPermissionListener;
     private PermissionListener microphonePermissionListener;
     private PermissionRequestErrorListener errorListener;
@@ -73,6 +72,13 @@ public class PermissionsActivity extends Activity {
 
     }
 
+    private void initDatabase(){
+        Realm.init(this);
+        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
+                .deleteRealmIfMigrationNeeded()
+                .build();
+        Realm.setDefaultConfiguration(realmConfiguration);
+    }
 
     private void createPermissionListeners(){
 
@@ -139,14 +145,6 @@ public class PermissionsActivity extends Activity {
         }
     }
 
-    private void initDatabase(){
-        Realm.init(this);
-        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
-                .deleteRealmIfMigrationNeeded()
-                .build();
-        Realm.setDefaultConfiguration(realmConfiguration);
-    }
-
     public void onCameraPermissionButtonClicked() {
         new Thread(new Runnable() {
             @Override public void run() {
@@ -161,7 +159,7 @@ public class PermissionsActivity extends Activity {
     }
 
     public void onMicrophonePermissionButtonClicked() {
-        new Thread(new Runnable() {
+        new Thread( new Runnable() {
             @Override public void run() {
                 Dexter.withActivity(PermissionsActivity.this)
                         .withPermission(Manifest.permission.RECORD_AUDIO)
@@ -171,32 +169,6 @@ public class PermissionsActivity extends Activity {
                         .check();
             }
         }).start();
-    }
-
-    public void showPermissionGranted(String permission) {
-        switch (permission) {
-            case Manifest.permission.CAMERA:
-                camPerm = true;
-                break;
-            case Manifest.permission.RECORD_AUDIO:
-                micPerm = true;
-                break;
-            default:
-                throw new RuntimeException("No feedback view for this permission");
-        }
-    }
-
-    public void showPermissionDenied(String permission, boolean isPermanentlyDenied) {
-        switch (permission) {
-            case Manifest.permission.CAMERA:
-                camPerm = false;
-                break;
-            case Manifest.permission.RECORD_AUDIO:
-                micPerm = false;
-                break;
-            default:
-                throw new RuntimeException("No feedback view for this permission");
-        }
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)

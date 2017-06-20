@@ -18,6 +18,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +33,8 @@ import me.thesquare.models.UserModel;
  */
 
 public class ApiHandler {
+    private static final String TAG = "APIHandler";
+    private UserModel userModel;
     private KeyManager keyManager;
     private String apiHost = "http://api.thesquare.me" ;
     private Context ctx;
@@ -109,10 +112,6 @@ public class ApiHandler {
                     return;
                 }
 
-                String body;
-                //get status code here
-                final String statusCode = String.valueOf(error.networkResponse.statusCode);
-                //get response body and parse with appropriate encoding
                 try {
                     JSONObject response = new JSONObject(new String(error.networkResponse.data,"UTF-8"));
 
@@ -179,6 +178,13 @@ public class ApiHandler {
         HashMap<String, String> requestBody = new HashMap<String, String>();
 
         JSONObject parameters = new JSONObject(params);
+        KeyFactory kf = null;
+        try {
+            kf = KeyFactory.getInstance("RSA");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        PrivateKey tempKey  = kf.generatePrivate(new X509EncodedKeySpec(userChat.getPrivateKey()));
 
         request(Request.Method.POST, "/v1/register", parameters, new ApiResponse(){
             @Override
