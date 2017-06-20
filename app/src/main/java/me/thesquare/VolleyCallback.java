@@ -7,6 +7,6 @@ import me.thesquare.models.UserModel;
  */
 
 public interface VolleyCallback {
-    void onSuccess(UserModel userModel);
+    void onSuccess(UserModel user);
 }
 

@@ -63,7 +63,6 @@ public class ApiHandler {
                     String user = payloadObj.getString("user");
                     JSONObject userObj = new JSONObject(user);
                     String id = userObj.getString("id");
-
                     userModel.setId(id);
                     callback.onSuccess(userModel);
                 }
@@ -122,12 +121,9 @@ public class ApiHandler {
         RealmHandler handler = new RealmHandler();
         UserModel userChat = handler.getUser(username);
 
-<<<<<<< HEAD
-        byte[] publicKeyByte = Base64.encode(user.getPublicKey(), 0);
+        byte[] publicKeyByte = Base64.encode(userChat.getPublicKey(), 0);
         publickey = new String(publicKeyByte);
-=======
         publickey = String.valueOf(userChat.getPublicKey());
->>>>>>> origin/Develop
         String registerurl = "http://api.thesquare.me/v1/streams";
         HashMap<String, String> params = new HashMap<>();
 
@@ -141,7 +137,7 @@ public class ApiHandler {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        PrivateKey tempKey  = kf.generatePrivate(new X509EncodedKeySpec(user.getPrivateKey()));
+        PrivateKey tempKey  = kf.generatePrivate(new X509EncodedKeySpec(userChat.getPrivateKey()));
 
         keyManager.setPrivateKey(tempKey);
         //keyManager.setPublicKey(kf.generatePublic(new X509EncodedKeySpec(user.getPublicKey())));
@@ -161,7 +157,7 @@ public class ApiHandler {
 
                     Log.d(TAG, "Response: " + payload);
 
-                 //   callback.onSuccess(id, name);
+                    callback.onSuccess(userModel);
                 }
                 catch(Exception e)
                 {

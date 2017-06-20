@@ -19,6 +19,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.thesquare.models.UserModel;
+
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -77,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             handler.chatService(current_user, this.getApplicationContext(), new VolleyCallback() {
                 @Override
-                public void onSuccess(String id, String name) {
+                public void onSuccess(UserModel user) {
 
                 }
             });
@@ -141,10 +143,8 @@ public class MainActivity extends AppCompatActivity {
     public void onCaptureClick(View view) {
         if (!isStarted){
             stopWatch.setBase(SystemClock.elapsedRealtime());
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/Develop
+
             stopWatch.start();
             isStarted = true;
         }
