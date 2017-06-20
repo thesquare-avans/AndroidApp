@@ -47,3 +47,7 @@ Thumbs.db
 
 
 \.idea/
+
+sonar-project\.properties
+
+\.scannerwork/
