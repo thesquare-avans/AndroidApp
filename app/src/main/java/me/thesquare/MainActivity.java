@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import java.io.IOException;
 import java.net.Socket;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,6 +72,23 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, e.getMessage());
         }
 
+        KeyManager manager = new KeyManager();
+        ApiHandler handler = new ApiHandler(manager);
+
+        SharedPreferences pref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        String current_user = pref.getString("cur_user", null);
+
+        try {
+            handler.chatService(current_user, this.getApplicationContext(), new VolleyCallback() {
+                @Override
+                public void onSuccess(String id, String name) {
+
+                }
+            });
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+
         listView.setAdapter(chatAdapter);
     }
 
@@ -115,19 +133,6 @@ public class MainActivity extends AppCompatActivity {
         if (!isStarted){
             stopWatch.setBase(SystemClock.elapsedRealtime());
 
-            KeyManager manager = new KeyManager();
-            ApiHandler handler = new ApiHandler(manager);
-
-            SharedPreferences pref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-            String current_user = pref.getString("cur_user", null);
-
-            handler.chatService(current_user, this.getApplicationContext(), new VolleyCallback() {
-                @Override
-                public void onSuccess(String id, String name) {
-
-                }
-            });
-          
             stopWatch.start();
             isStarted = true;
         }

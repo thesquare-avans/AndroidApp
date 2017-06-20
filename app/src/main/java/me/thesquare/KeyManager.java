@@ -151,18 +151,36 @@ public class KeyManager {
     }
 
     public String signMessage(String message) {
+        String signedMessage = null;
         try {
             sig = Signature.getInstance("SHA256withRSA");
             sig.initSign(this.privateKey);
             sig.update(message.getBytes("UTF-8"));
-
-            return bytesToHex(sig.sign());
+            signedMessage = bytesToHex(sig.sign());
         } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException | UnsupportedEncodingException e) {
             Log.d(TAG, e.getMessage());
         }
 
-        return null;
+        return signedMessage;
     }
 
+    public void setPublicKeyPem(byte[] publicKey) {
+        StringWriter writer = new StringWriter();
+        PemWriter pemWriter = new PemWriter(writer);
+
+        try {
+           pemWriter.writeObject(new PemObject("PUBLIC KEY", publicKey));
+           pemWriter.flush();
+           pemWriter.close();
+           } catch (IOException err) {
+           Log.d("err", err.getMessage());
+           }
+        this.publicKeyPem = writer.toString();
+        Log.d("publicKey", this.publicKeyPem);
+        }
+
+    public void setPrivateKey(PrivateKey priv) {
+        privateKey = priv;
+    }
 }
 
