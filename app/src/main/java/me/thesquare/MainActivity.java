@@ -1,5 +1,6 @@
 package me.thesquare;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.os.SystemClock;
@@ -120,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         ChatItem addChat = new ChatItem();
         addChat.setChatname("You");
         if(chatInput.getText().toString().equals("")){
-            Toast.makeText(this, "test", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please fill in the field!", Toast.LENGTH_SHORT).show();
         } else {
             addChat.setChattext(chatInput.getText().toString());
             chat.add(addChat);
