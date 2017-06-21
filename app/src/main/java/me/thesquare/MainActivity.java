@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private ApiHandler handler;
     private StreamModel streamModel;
     private KeyManager manager;
-    private ListView listview;
+    private ListView listView;
 
     private String current_user;
 
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         chatInput = (EditText) findViewById(R.id.chatinput);
-        listview = (ListView) findViewById(R.id.lvChat);
+        listView = (ListView) findViewById(R.id.lvChat);
         permissionHandler = new PermissionHandler(this.getApplicationContext());
         chatAdapter = new ChatListViewAdapter(this, getLayoutInflater(), (ArrayList<ChatItem>) chat);
         satosi = (TextView) findViewById(R.id.txtSatoshi);
