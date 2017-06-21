@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
         if(message.equals("")){
             Toast.makeText(this, "Please fill in the field.", Toast.LENGTH_SHORT).show();
         } else {
-            chatSocket.identify();
+            chatSocket.sendMessage(message);
 
             AddChat("You", message);
             chatInput.setText("");
