@@ -3,6 +3,7 @@ package me.thesquare;
 import android.content.Context;
 import android.util.Base64;
 import android.util.Log;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -10,15 +11,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.UnsupportedEncodingException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,9 +33,10 @@ import me.thesquare.models.UserModel;
 
 public class ApiHandler {
     private static final String TAG = "APIHandler";
+    private static final String API_TAG = "API ERROR";
+    private static final String API_HOST = "http://api.thesquare.me" ;
     private UserModel userModel;
     private KeyManager keyManager;
-    private String apiHost = "http://api.thesquare.me" ;
     private Context ctx;
 
     public ApiHandler(KeyManager keyManager,Context ctx) {
@@ -53,14 +53,14 @@ public class ApiHandler {
         if(body != null) {
             String payload = body.toString();
 
-            HashMap<String, String> requestBody = new HashMap<String, String>();
+            HashMap<String, String> requestBody = new HashMap<>();
             requestBody.put("payload", payload);
             requestBody.put("signature", keyManager.signMessage(payload));
 
             requestBodyJSON = new JSONObject(requestBody);
         }
 
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(method, (apiHost+endPoint), requestBodyJSON, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(method, (API_HOST +endPoint), requestBodyJSON, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -83,7 +83,7 @@ public class ApiHandler {
                     callback.on(true, payloadObj);
                 }
                 catch(JSONException e) {
-                    e.getMessage();
+                    Log.d(TAG, e.getMessage());
 
                     try {
                         JSONObject invalidResponse = new JSONObject();
@@ -92,7 +92,7 @@ public class ApiHandler {
                         callback.on(false, invalidResponse);
                         return;
                     } catch(JSONException err) {
-                        err.getMessage();
+                        Log.d(TAG, err.getMessage());
                     }
                 }
             }
@@ -107,7 +107,7 @@ public class ApiHandler {
                         callback.on(false, invalidResponse);
                         return;
                     } catch(JSONException err) {
-                        err.getMessage();
+                        Log.d(TAG, err.getMessage());
                     }
                     return;
                 }
@@ -133,6 +133,7 @@ public class ApiHandler {
 
                     callback.on(true, payloadObj);
                 } catch (UnsupportedEncodingException e) {
+                    Log.d(TAG, e.getMessage());
                     // exception
                 } catch (JSONException e) {
                     try {
@@ -142,7 +143,7 @@ public class ApiHandler {
                         callback.on(false, invalidResponse);
                         return;
                     } catch(JSONException err) {
-                        err.getMessage();
+                        Log.d(TAG, err.getMessage());
                     }
                 }
             }
@@ -159,7 +160,7 @@ public class ApiHandler {
                         key = Base64.encodeToString(pemKey.getBytes("UTF-8"), Base64.NO_WRAP);
                     }
                 } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+                    Log.d(TAG, e.getMessage());
                 }
                 //String pubkey = new String(key);
                 headers.put("Content-Type", "application/json; charset=utf-8");
@@ -175,14 +176,14 @@ public class ApiHandler {
         HashMap<String, String> params = new HashMap<>();
 
         params.put("name", userModel.getUsername());
-        HashMap<String, String> requestBody = new HashMap<String, String>();
+        HashMap<String, String> requestBody = new HashMap<>();
 
         JSONObject parameters = new JSONObject(params);
         KeyFactory kf = null;
         try {
             kf = KeyFactory.getInstance("RSA");
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
         }
 
         request(Request.Method.POST, "/v1/register", parameters, new ApiResponse(){
@@ -203,11 +204,11 @@ public class ApiHandler {
                     return;
                 }
 
-                Log.d("API ERROR", "api not successful");
+                Log.d(API_TAG, "api not successful");
                 try {
-                    Log.d("API ERROR", data.getJSONObject("error").toString());
+                    Log.d(API_TAG, data.getJSONObject("error").toString());
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    Log.d(TAG, e.getMessage());
                 }
             }
         });
@@ -217,7 +218,7 @@ public class ApiHandler {
         HashMap<String, String> params = new HashMap<>();
 
         params.put("title", title);
-        HashMap<String, String> requestBody = new HashMap<String, String>();
+        HashMap<String, String> requestBody = new HashMap<>();
 
         JSONObject parameters = new JSONObject(params);
 
@@ -233,13 +234,13 @@ public class ApiHandler {
 
                         callback.on(stream);
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        Log.d(TAG, e.getMessage());
                     }
 
                     return;
                 }
 
-                Log.d("API ERROR", "api not successful\n"+data.toString());
+                Log.d(API_TAG, "api not successful\n"+data.toString());
             }
         });
     }
@@ -259,7 +260,7 @@ public class ApiHandler {
 
                         callback.on(user);
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        Log.d(TAG, e.getMessage());
                     }
 
                     return;
@@ -271,10 +272,10 @@ public class ApiHandler {
                         return;
                     }
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    Log.d(TAG, e.getMessage());
                 }
 
-                Log.d("API ERROR", "api not successful\n"+data.toString());
+                Log.d(API_TAG, "api not successful\n"+data.toString());
             }
         });
     }
