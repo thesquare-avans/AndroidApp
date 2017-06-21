@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
     private Chronometer stopWatch;
     private boolean isStarted;
     private ChatSocket chatSocket;
-    private TextView satosi;
     private ApiHandler handler;
     private StreamModel streamModel;
     private KeyManager manager;

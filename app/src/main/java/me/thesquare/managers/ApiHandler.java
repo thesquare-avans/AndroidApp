@@ -44,9 +44,12 @@ public class ApiHandler {
     private static final String TAG = "APIHandler";
     private static final String API_TAG = "API ERROR";
     private static final String API_HOST = "http://api.thesquare.me" ;
+    private static final String API_NOT_SUCCESSFUL = "api not successful\n" ;
     private static final String PAYLOAD = "payload";
     private static final String SUCCESS = "success";
     private static final String ERROR = "error";
+    private static final String UTF8 = "UTF-8";
+    private static final String SATOSHI = "satoshi";
     private KeyManager keyManager;
     private Context ctx;
 
@@ -126,7 +129,7 @@ public class ApiHandler {
                 }
 
                 try {
-                    JSONObject response = new JSONObject(new String(error.networkResponse.data,"UTF-8"));
+                    JSONObject response = new JSONObject(new String(error.networkResponse.data,UTF8));
 
                     if(!keyManager.verifyResponse(response)) {
                         JSONObject invalidSignature = new JSONObject();
@@ -170,7 +173,7 @@ public class ApiHandler {
                     String pemKey = keyManager.getPublicKeyPem();
                     key = "";
                     if(pemKey != null) {
-                        key = Base64.encodeToString(pemKey.getBytes("UTF-8"), Base64.NO_WRAP);
+                        key = Base64.encodeToString(pemKey.getBytes(UTF8), Base64.NO_WRAP);
                     }
                 } catch (UnsupportedEncodingException e) {
                     Log.d(TAG, e.getMessage());
@@ -209,7 +212,7 @@ public class ApiHandler {
                     return;
                 }
 
-                Log.d(API_TAG, "api not successful");
+                Log.d(API_TAG, API_NOT_SUCCESSFUL);
                 try {
                     Log.d(API_TAG, data.getJSONObject(ERROR).toString());
                 } catch (JSONException e) {
@@ -254,7 +257,7 @@ public class ApiHandler {
                 } catch (JSONException e) {
                     Log.d(TAG, e.getMessage());
                 }
-                Log.d(API_TAG, "api not successful\n"+data.toString());
+                Log.d(API_TAG, API_NOT_SUCCESSFUL+data.toString());
             }
         });
     }
@@ -280,7 +283,7 @@ public class ApiHandler {
                     return;
                 }
 
-                Log.d(API_TAG, "api not successful\n"+data.toString());
+                Log.d(API_TAG, API_NOT_SUCCESSFUL+data.toString());
             }
         });
     }
@@ -294,13 +297,13 @@ public class ApiHandler {
                         UserModel user = new UserModel();
                         JSONObject userData = data.getJSONObject("user");
                         user.setId(userData.getString("id"));
-                        if (userData.getInt("satoshi") == 0) {
+                        if (userData.getInt(SATOSHI) == 0) {
                             user.setSatoshi(1);
                         }
                         else{
-                            user.setSatoshi(userData.getInt("satoshi"));
+                            user.setSatoshi(userData.getInt(SATOSHI));
                         }
-                        user.setSatoshi(userData.getInt("satoshi"));
+                        user.setSatoshi(userData.getInt(SATOSHI));
                         user.setUsername(userData.getString("name"));
                         callback.on(user);
                     } catch (JSONException e) {
@@ -319,7 +322,7 @@ public class ApiHandler {
                     Log.d(TAG, e.getMessage());
                 }
 
-                Log.d(API_TAG, "api not successful\n"+data.toString());
+                Log.d(API_TAG, API_NOT_SUCCESSFUL+data.toString());
             }
         });
     }
@@ -331,7 +334,7 @@ public class ApiHandler {
                     Log.d(TAG, "Stream deleted!");
                     return;
                 }
-                Log.d(API_TAG, "api not successful\n"+data.toString());
+                Log.d(API_TAG, API_NOT_SUCCESSFUL+data.toString());
             }
         });
     }
@@ -347,7 +350,7 @@ public class ApiHandler {
                         user.setId(userData.getString("id"));
                         user.setUsername(userData.getString("name"));
                         try {
-                            String stringDecoded = new String(Base64.decode(userData.getString("publicKey").getBytes("UTF-8"), Base64.NO_WRAP), "UTF-8");
+                            String stringDecoded = new String(Base64.decode(userData.getString("publicKey").getBytes(UTF8), Base64.NO_WRAP), UTF8);
                             PemReader pemReader = new PemReader(new StringReader(stringDecoded));
                             PemObject pemObject = pemReader.readPemObject();
 
@@ -366,7 +369,7 @@ public class ApiHandler {
 
                     return;
                 }
-                Log.d(API_TAG, "api not successful\n"+data.toString());
+                Log.d(API_TAG, API_NOT_SUCCESSFUL+data.toString());
             }
         });
     }
