@@ -26,7 +26,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import me.thesquare.apiresponses.StreamResponse;
+import me.thesquare.apiresponses.UserResponse;
 import me.thesquare.models.StreamModel;
+import me.thesquare.models.UserModel;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -64,7 +66,33 @@ public class MainActivity extends AppCompatActivity {
 
         TextureView textureView = (TextureView) findViewById(R.id.texture);
         stopWatch = (Chronometer) findViewById(R.id.stopWatch);
+        stopWatch.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener()
+        {
 
+            KeyManager keyManager = ((TheSquareApplication) getApplication()).keyManager;
+
+            @Override
+            public void onChronometerTick(Chronometer chronometer)
+            {
+                int elapsedMillis = (int) (SystemClock.elapsedRealtime() - chronometer.getBase());
+                int seconds = (int) elapsedMillis / 1000;
+
+                if (seconds % 3600 == 0 && seconds != 0){
+                    ApiHandler apihandler = new ApiHandler(keyManager, getApplicationContext());
+                    apihandler.getLoggedInUser(new UserResponse() {
+                        @Override
+                        public void on(UserModel userModel) {
+                            if(userModel != null)
+                            {
+                                String satoshi = Integer.toString(userModel.getSatoshi());
+                                TextView txtSatoshi = (TextView) findViewById(R.id.txtSatoshi);
+                                txtSatoshi.setText(satoshi);
+                            }
+                        }
+                    });
+                }
+            }
+        });
         chatInput = (EditText) findViewById(R.id.chatinput);
         ListView listView = (ListView) findViewById(R.id.lvChat);
         permissionHandler = new PermissionHandler(this.getApplicationContext());
