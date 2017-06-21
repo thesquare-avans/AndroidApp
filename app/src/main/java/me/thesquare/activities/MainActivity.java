@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
     private EditText chatInput;
     private FSDClient fsdClient;
     private List<ChatItem> chat = new ArrayList<>();
-    private ChatListViewAdapter chatAdapter;
     private PermissionHandler permissionHandler;
     private Chronometer stopWatch;
     private boolean isStarted;
@@ -53,10 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private ApiHandler handler;
     private StreamModel streamModel;
     private KeyManager manager;
-    private ListView listView;
-
-    private String current_user;
-
+    private String currentUser;
     private Socket serverConnection;
 
 
@@ -67,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-        current_user = sharedPref.getString("cur_user", null);
+        currentUser = sharedPref.getString("cur_user", null);
         setContentView(R.layout.activity_main);
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .detectNetwork() // or .detectAll() for all detectable problems
@@ -78,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         TextureView textureView = (TextureView) findViewById(R.id.texture);
         stopWatch = (Chronometer) findViewById(R.id.stopWatch);
         TextView txtSatoshi = (TextView) findViewById(R.id.txtSatoshi);
-        txtSatoshi.setText(1 +"");
+        txtSatoshi.setText(String.valueOf(1));
         stopWatch.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener()
         {
 
@@ -88,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             public void onChronometerTick(Chronometer chronometer)
             {
                 int elapsedMillis = (int) (SystemClock.elapsedRealtime() - chronometer.getBase());
-                int seconds = (int) elapsedMillis / 1000;
+                int seconds = elapsedMillis / 1000;
 
                 if (seconds % 3600 == 0 && seconds != 0){
                     ApiHandler apihandler = new ApiHandler(keyManager, getApplicationContext());
@@ -107,9 +103,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         chatInput = (EditText) findViewById(R.id.chatinput);
-        listView = (ListView) findViewById(R.id.lvChat);
+        ListView listView = (ListView) findViewById(R.id.lvChat);
         permissionHandler = new PermissionHandler(this.getApplicationContext());
-        chatAdapter = new ChatListViewAdapter(this, getLayoutInflater(), (ArrayList<ChatItem>) chat);
+        ChatListViewAdapter chatAdapter = new ChatListViewAdapter(this, getLayoutInflater(), (ArrayList<ChatItem>) chat);
 
 
 
@@ -135,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onPause() {
         super.onPause();
-        Log.e(TAG, "onPause");
+        Log.d(TAG, "onPause");
         recorder.releaseMediaRecorder();
         recorder.releaseCamera();
     }
@@ -151,12 +147,12 @@ public class MainActivity extends AppCompatActivity {
         handler = new ApiHandler(manager, this);
         final MainActivity thisInstance = this;
 
-        handler.startStream(current_user + "_Stream", new StreamResponse() {
+        handler.startStream(currentUser + "_Stream", new StreamResponse() {
             @Override
             public void on(StreamModel streamModel) {
                 chatSocket = new ChatSocket(streamModel.getChatserver(), streamModel.getId(), manager, handler, thisInstance);
                 chatSocket.socketConnect();
-                Log.e("gekke chat", streamModel.toString());
+                Log.d(TAG, streamModel.toString());
             }
         });
     }
@@ -175,18 +171,14 @@ public class MainActivity extends AppCompatActivity {
         chat.add(addChat);
         int chatSize = chat.size();
         if (chatSize >= 5) {
-            //chatAdapter.notifyDataSetChanged();
             chat.remove(0);
-
         }
-
     }
 
     public void sendChat(){
         if(chatInput.getText().toString().equals("")){
             Toast.makeText(this, "Please fill in the field.", Toast.LENGTH_SHORT).show();
         } else {
-
             AddChat("You", chatInput.getText().toString());
             chatInput.setText("");
         }

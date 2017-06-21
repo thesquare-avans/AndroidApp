@@ -44,7 +44,9 @@ public class ApiHandler {
     private static final String TAG = "APIHandler";
     private static final String API_TAG = "API ERROR";
     private static final String API_HOST = "http://api.thesquare.me" ;
-    private UserModel userModel;
+    private static final String PAYLOAD = "payload";
+    private static final String SUCCESS = "success";
+    private static final String ERROR = "error";
     private KeyManager keyManager;
     private Context ctx;
 
@@ -63,7 +65,7 @@ public class ApiHandler {
             String payload = body.toString();
 
             HashMap<String, String> requestBody = new HashMap<>();
-            requestBody.put("payload", payload);
+            requestBody.put(PAYLOAD, payload);
             requestBody.put("signature", keyManager.signMessage(payload));
 
             requestBodyJSON = new JSONObject(requestBody);
@@ -75,18 +77,18 @@ public class ApiHandler {
                 try {
                     if(!keyManager.verifyResponse(response)) {
                         JSONObject invalidSignature = new JSONObject();
-                        invalidSignature.put("success", false);
-                        invalidSignature.put("error", new JSONObject().put("code", "invalidResponseSignature"));
+                        invalidSignature.put(SUCCESS, false);
+                        invalidSignature.put(ERROR, new JSONObject().put("code", "invalidResponseSignature"));
                         callback.on(false, invalidSignature);
                         return;
                     }
 
-                    String payload = response.getString("payload");
+                    String payload = response.getString(PAYLOAD);
                     JSONObject payloadObj = new JSONObject(payload);
 //                    JSONObject chatHostObj = new JSONObject("chatServer");
 //                    String hostname = chatHostObj.getString("hostname");
 //                    Log.d("TestHost", hostname);
-                    if(!payloadObj.getBoolean("success")) {
+                    if(!payloadObj.getBoolean(SUCCESS)) {
                         callback.on(false, payloadObj);
                         return;
                     }
@@ -98,8 +100,8 @@ public class ApiHandler {
 
                     try {
                         JSONObject invalidResponse = new JSONObject();
-                        invalidResponse.put("success", false);
-                        invalidResponse.put("error", new JSONObject().put("code", "invalidResponseSignature"));
+                        invalidResponse.put(SUCCESS, false);
+                        invalidResponse.put(ERROR, new JSONObject().put("code", "invalidResponseSignature"));
                         callback.on(false, invalidResponse);
                         return;
                     } catch(JSONException err) {
@@ -113,8 +115,8 @@ public class ApiHandler {
                 if (error == null || error.networkResponse == null) {
                     try {
                         JSONObject invalidResponse = new JSONObject();
-                        invalidResponse.put("success", false);
-                        invalidResponse.put("error", new JSONObject().put("code", "invalidOrNoResponse"));
+                        invalidResponse.put(SUCCESS, false);
+                        invalidResponse.put(ERROR, new JSONObject().put("code", "invalidOrNoResponse"));
                         callback.on(false, invalidResponse);
                         return;
                     } catch(JSONException err) {
@@ -128,16 +130,16 @@ public class ApiHandler {
 
                     if(!keyManager.verifyResponse(response)) {
                         JSONObject invalidSignature = new JSONObject();
-                        invalidSignature.put("success", false);
-                        invalidSignature.put("error", new JSONObject().put("code", "invalidResponseSignature"));
+                        invalidSignature.put(SUCCESS, false);
+                        invalidSignature.put(ERROR, new JSONObject().put("code", "invalidResponseSignature"));
                         callback.on(false, invalidSignature);
                         return;
                     }
 
-                    String payload = response.getString("payload");
+                    String payload = response.getString(PAYLOAD);
                     JSONObject payloadObj = new JSONObject(payload);
 
-                    if(!payloadObj.getBoolean("success")) {
+                    if(!payloadObj.getBoolean(SUCCESS)) {
                         callback.on(false, payloadObj);
                         return;
                     }
@@ -149,8 +151,8 @@ public class ApiHandler {
                 } catch (JSONException e) {
                     try {
                         JSONObject invalidResponse = new JSONObject();
-                        invalidResponse.put("success", false);
-                        invalidResponse.put("error", new JSONObject().put("code", "invalidOrNoResponse"));
+                        invalidResponse.put(SUCCESS, false);
+                        invalidResponse.put(ERROR, new JSONObject().put("code", "invalidOrNoResponse"));
                         callback.on(false, invalidResponse);
                         return;
                     } catch(JSONException err) {
@@ -201,7 +203,7 @@ public class ApiHandler {
                         userModel.setId(id);
                         callback.on();
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        Log.d(TAG, e.getMessage());
                     }
 
                     return;
@@ -209,7 +211,7 @@ public class ApiHandler {
 
                 Log.d(API_TAG, "api not successful");
                 try {
-                    Log.d(API_TAG, data.getJSONObject("error").toString());
+                    Log.d(API_TAG, data.getJSONObject(ERROR).toString());
                 } catch (JSONException e) {
                     Log.d(TAG, e.getMessage());
                 }
@@ -245,12 +247,12 @@ public class ApiHandler {
                 }
 
                 try {
-                    if(data.getJSONObject("error").getString("code").equals("alreadyStreaming")) {
+                    if(data.getJSONObject(ERROR).getString("code").equals("alreadyStreaming")) {
                         getStream(data.getString("streamId"), callback);
                         return;
                     }
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    Log.d(TAG, e.getMessage());
                 }
                 Log.d(API_TAG, "api not successful\n"+data.toString());
             }
@@ -309,7 +311,7 @@ public class ApiHandler {
                 }
 
                 try {
-                    if (data.getJSONObject("error").getString("code") == "userNotFound") {
+                    if (data.getJSONObject(ERROR).getString("code") == "userNotFound") {
                         callback.on(null);
                         return;
                     }
@@ -355,7 +357,7 @@ public class ApiHandler {
                             X509EncodedKeySpec spec = new X509EncodedKeySpec(publicKeyContent);
                             user.setPublicKey(kf.generatePublic(spec).getEncoded());
                         } catch (NoSuchAlgorithmException | IOException | NoSuchProviderException | InvalidKeySpecException e) {
-                            e.printStackTrace();
+                            Log.d(TAG, e.getMessage());
                         }
                         callback.on(user);
                     } catch (JSONException e) {

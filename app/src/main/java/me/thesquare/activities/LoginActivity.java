@@ -33,12 +33,10 @@ import me.thesquare.models.UserModel;
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private Realm realm;
-    private Button btnLogin;
     private EditText txtUsername;
     private KeyManager keyManager;
     private SharedPreferences sharedPref;
     private PermissionHandler permissionHandler;
-    private String current_user;
     private ApiHandler apihandler;
 
     @Override
@@ -52,11 +50,11 @@ public class LoginActivity extends AppCompatActivity {
         keyManager = ((TheSquareApplication) this.getApplication()).keyManager;
 
         sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-        current_user = sharedPref.getString("cur_user", null);
-        userExists(current_user);
+        String currentUser = sharedPref.getString("cur_user", null);
+        userExists(currentUser);
 
         txtUsername = (EditText) findViewById(R.id.editText);
-        btnLogin = (Button) findViewById(R.id.btnLogin);
+        Button btnLogin = (Button) findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -72,10 +70,10 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private boolean userExists(String current_user){
+    private boolean userExists(String currentUser){
 
-        if (current_user != null) {
-            RealmResults<UserModel> result = realm.where( UserModel.class ).equalTo( "username", current_user).findAll();
+        if (currentUser != null) {
+            RealmResults<UserModel> result = realm.where( UserModel.class ).equalTo( "username", currentUser).findAll();
             final List<UserModel> user = realm.copyFromRealm(result);
             if(user.isEmpty()) {
                 return false;
@@ -181,9 +179,9 @@ public class LoginActivity extends AppCompatActivity {
 
         if ( result != null && result.size() > 0) {
             for (int i = 0; i < result.size(); i++) {
-                Log.d( "Name", result.get(i).getUsername() );
-                Log.d( "Public key", result.get(i).getPublicKey().toString() );
-                Log.d( "Private key", result.get(i).getPrivateKey().toString() );
+                Log.d( TAG, "Name" + result.get(i).getUsername() );
+                Log.d( TAG, "Public key" + result.get(i).getPublicKey().toString() );
+                Log.d( TAG, "Private key" + result.get(i).getPrivateKey().toString() );
             }
         }
     }

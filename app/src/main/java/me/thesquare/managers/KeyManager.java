@@ -131,7 +131,7 @@ public class KeyManager {
         try {
             payload = response.getString("payload");
         } catch (JSONException e) {
-            Log.d("TheSquare", "Missing payload");
+            Log.d(TAG, "Missing payload");
             return false;
         }
 
@@ -139,7 +139,7 @@ public class KeyManager {
         try {
             signature = response.getString("signature");
         } catch (JSONException e) {
-            Log.d("TheSquare", "Missing signature");
+            Log.d(TAG, "Missing signature");
             return false;
         }
 
@@ -152,10 +152,10 @@ public class KeyManager {
                     X509EncodedKeySpec spec = new X509EncodedKeySpec(key);
                     senderPublicKey = kf.generatePublic(spec);
                 } catch (InvalidKeySpecException e) {
-                    e.printStackTrace();
+                    Log.d(TAG, e.getMessage());
                     return false;
                 } catch (NoSuchProviderException e) {
-                    e.printStackTrace();
+                    Log.d(TAG, e.getMessage());
                     return false;
                 }
             }
@@ -163,11 +163,11 @@ public class KeyManager {
             sig.update(payload.getBytes("UTF-8"));
             return sig.verify(hexStringToByteArray(signature));
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
-            Log.d("TheSquare", "No algorithm, invalid key or invalid signature");
+            Log.d(TAG, "No algorithm, invalid key or invalid signature");
             Log.d(TAG, e.getMessage());
             return false;
         } catch (UnsupportedEncodingException e) {
-            Log.d("TheSquare", "Unsupported encoding");
+            Log.d(TAG, "Unsupported encoding");
             Log.d(TAG, e.getMessage());
             return false;
         }

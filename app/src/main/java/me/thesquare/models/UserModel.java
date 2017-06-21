@@ -39,7 +39,7 @@ public class UserModel extends RealmObject {
     }
 
     public void setId(String id) {
-        this.id = id.toString();
+        this.id = id;
     }
 
     public String getId() {

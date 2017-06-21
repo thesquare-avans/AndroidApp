@@ -14,7 +14,7 @@ import me.thesquare.R;
 import me.thesquare.models.ChatItem;
 
 public class ChatListViewAdapter extends BaseAdapter {
-
+    private static final String TAG = "ChatListAdapter";
     private Context mContext;
     private LayoutInflater mInflator;
     private ArrayList mPersonArrayList;
@@ -29,13 +29,13 @@ public class ChatListViewAdapter extends BaseAdapter {
     @Override
     public int getCount() {
         int size = mPersonArrayList.size();
-        Log.i("getCount()","=" + size);
+        Log.d(TAG, "getCount()" + "=" + size);
         return size;
     }
 
     @Override
     public Object getItem(int position) {
-        Log.i("getItem()","");
+        Log.d(TAG,"getItem()");
         return mPersonArrayList.get(position);
     }
 

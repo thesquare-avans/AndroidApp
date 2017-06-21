@@ -73,7 +73,7 @@ public class ChatSocket {
 
             return payloadObj;
         } catch (JSONException e) {
-            Log.d("TheSquare-Chat", e.getMessage());
+            Log.d(TAG, e.getMessage());
 
             try {
                 JSONObject invalidResponse = new JSONObject();
@@ -81,7 +81,7 @@ public class ChatSocket {
                 invalidResponse.put("error", new JSONObject().put("code", "invalidResponseSignature"));
                 return invalidResponse;
             } catch (JSONException err) {
-                Log.d("TheSquare-Chat", err.getMessage());
+                Log.d(TAG, err.getMessage());
             }
         }
 
@@ -129,14 +129,14 @@ public class ChatSocket {
             on("message", new ChatResponse() {
                 @Override
                 public void on(final JSONObject body) {
-                    Log.d("SWaggerbody", body.toString());
+                    Log.d(TAG, body.toString());
                     if(body != null) {
                         try {
                             if(body.getBoolean("success")) {
                                 UserModel sender = userCache.get(body.getJSONObject("data").getString("sender"));
                                 if(sender != null) {
                                     JSONObject senderBody = verifyBody(body.getJSONObject("data").getJSONObject("data"), sender.getPublicKey());
-                                    Log.d("TheSquare-Chat", senderBody.toString());
+                                    Log.d(TAG, senderBody.toString());
                                     addChat(sender, senderBody.getString("message"));
 
                                     return;
@@ -148,22 +148,22 @@ public class ChatSocket {
                                         userCache.put(userModel.getId(), userModel);
                                         try {
                                             JSONObject senderBody = verifyBody(body.getJSONObject("data").getJSONObject("data"), userModel.getPublicKey());
-                                            Log.d("TheSquare-Chat", senderBody.toString());
+                                            Log.d(TAG, senderBody.toString());
                                             addChat(userModel , senderBody.getString("message"));
                                         } catch (JSONException e) {
-                                            e.printStackTrace();
+                                            Log.d(TAG, e.getMessage());
                                         }
                                     }
                                 });
                             }
                         } catch (JSONException e) {
-                            e.printStackTrace();
+                            Log.d(TAG, e.getMessage());
                         }
                     }
                 }
             });
         } catch (URISyntaxException e) {
-
+            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -174,19 +174,18 @@ public class ChatSocket {
             emit("identify", identifyBody, new ChatResponse() {
                 @Override
                 public void on(JSONObject body) {
-                    Log.d("TheSquare-Chat", body.toString());
+                    Log.d(TAG, body.toString());
                     try {
                         if(body.getBoolean("success")){
                             join();
                         }
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        Log.d(TAG, e.getMessage());
                     }
                 }
             });
-        } catch (JSONException e) {
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        } catch (JSONException | UnsupportedEncodingException e) {
+            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -201,10 +200,11 @@ public class ChatSocket {
             emit("join", joinBody, new ChatResponse() {
                 @Override
                 public void on(JSONObject body) {
-                    Log.d("TheSquare-Chat", body.toString());
+                    Log.d(TAG, body.toString());
                 }
             });
         } catch (JSONException e) {
+            Log.d(TAG, e.getMessage());
         }
     }
 
