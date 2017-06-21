@@ -208,6 +208,23 @@ public class ChatSocket {
             Log.d(TAG, e.getMessage());
         }
     }
+    
+    private void sendMessage(String message) {
+        try {
+            JSONObject messageBody = new JSONObject();
+            messageBody.put("room", streamid);
+            messageBody.put("message", message); 
+            emit("message", messageBody, new ChatResponse() {
+                @Override
+                public void on(JSONObject body) {
+                    // shit hit the fan, versturen chat gaat fout om wat voor reden dan ook
+                    Log.d(TAG, body.toString());
+                }
+            });
+        } catch (JSONException e) {
+            Log.d(TAG, e.getMessage());
+        }
+    }
 
     public void socketDisconnect (){
         mSocket.disconnect();
