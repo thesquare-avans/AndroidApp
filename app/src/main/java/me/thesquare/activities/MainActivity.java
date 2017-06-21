@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private KeyManager manager;
     private String currentUser;
     private Socket serverConnection;
+    private SharedPreferences sharedPref;
 
 
 
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         isStarted = false;
         super.onCreate(savedInstanceState);
 
-        SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         currentUser = sharedPref.getString("cur_user", null);
         setContentView(R.layout.activity_main);
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
@@ -174,11 +175,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void sendChat(){
-        if(chatInput.getText().toString().equals("")){
+    public void sendChat(View view){
+        String message = chatInput.getText().toString();
+        if(message.equals("")){
             Toast.makeText(this, "Please fill in the field.", Toast.LENGTH_SHORT).show();
         } else {
-            AddChat("You", chatInput.getText().toString());
+            chatSocket.identify();
+
+            AddChat("You", message);
             chatInput.setText("");
         }
     }

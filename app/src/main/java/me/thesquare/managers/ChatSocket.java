@@ -4,8 +4,10 @@ package me.thesquare.managers;
  * Created by ruben on 20-6-2017.
  */
 
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.EditText;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Ack;
@@ -34,7 +36,6 @@ public class ChatSocket {
     private ApiHandler handler;
     private HashMap<String, UserModel> userCache;
     private MainActivity mainActivity;
-
 
     public ChatSocket(String chatHostName, String streamid, KeyManager keyManager, ApiHandler handler, MainActivity mainActivity) {
         this.chatHostName = chatHostName;
@@ -167,7 +168,7 @@ public class ChatSocket {
         }
     }
 
-    private void identify() {
+    public void identify() {
         try {
             JSONObject identifyBody = new JSONObject();
             identifyBody.put("publicKey", Base64.encodeToString(keyManager.getPublicKeyPem().getBytes("UTF-8"), Base64.NO_WRAP));
