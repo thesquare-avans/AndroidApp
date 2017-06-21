@@ -250,6 +250,7 @@ public class ApiHandler {
                         else{
                             user.setSatoshi(userData.getInt("satoshi"));
                         }
+                        user.setSatoshi(userData.getInt("satoshi"));
                         user.setUsername(userData.getString("name"));
                         callback.on(user);
                     } catch (JSONException e) {
