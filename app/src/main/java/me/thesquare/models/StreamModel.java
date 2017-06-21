@@ -5,6 +5,10 @@ package me.thesquare.models;
  */
 
 public class StreamModel {
+    private String id;
+    private String title;
+    private String chatServer;
+
     public String getId() {
         return id;
     }
@@ -21,6 +25,9 @@ public class StreamModel {
         this.title = title;
     }
 
-    private String id;
-    private String title;
+    public String getChatserver() { return chatServer; }
+
+    public void setChatServer(String chatServer) { this.chatServer = chatServer;  }
+
+
 }

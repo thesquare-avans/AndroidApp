@@ -122,7 +122,11 @@ public class KeyManager {
         return data;
     }
 
-    public boolean verifyResponse(JSONObject response){
+    public boolean verifyResponse(JSONObject response) {
+        return verifyResponse(response, null);
+    }
+
+    public boolean verifyResponse(JSONObject response, byte[] key){
         String payload;
         try {
             payload = response.getString("payload");
@@ -140,9 +144,22 @@ public class KeyManager {
         }
 
         try {
-
             sig = Signature.getInstance("SHA256withRSA");
-            sig.initVerify(this.serverPublicKey);
+            PublicKey senderPublicKey = this.serverPublicKey;
+            if(key != null) {
+                try {
+                    KeyFactory kf = KeyFactory.getInstance("RSA", "BC");
+                    X509EncodedKeySpec spec = new X509EncodedKeySpec(key);
+                    senderPublicKey = kf.generatePublic(spec);
+                } catch (InvalidKeySpecException e) {
+                    e.printStackTrace();
+                    return false;
+                } catch (NoSuchProviderException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+            sig.initVerify(senderPublicKey);
             sig.update(payload.getBytes("UTF-8"));
             return sig.verify(hexStringToByteArray(signature));
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {

@@ -45,6 +45,14 @@
         tools:ignore="RtlHardcoded" />
 
     <Button
+        android:id="@+id/btnExit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/lvChat"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="46dp"
+        android:text="EXIT" />
+    <Button
         android:id="@+id/btnChat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

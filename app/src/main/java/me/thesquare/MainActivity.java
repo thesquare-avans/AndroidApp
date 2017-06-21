@@ -1,5 +1,6 @@
 package me.thesquare;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -8,9 +9,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,6 +40,11 @@ public class MainActivity extends AppCompatActivity {
     private Chronometer stopWatch;
     private boolean isStarted;
     private ChatSocket chatSocket;
+    private TextView satosi;
+    private ApiHandler handler;
+    private StreamModel streamModel;
+    private Button btnExit;
+    private KeyManager manager;
 
 
     @Override
@@ -55,13 +63,14 @@ public class MainActivity extends AppCompatActivity {
         stopWatch = (Chronometer) findViewById(R.id.stopWatch);
 
         chatInput = (EditText) findViewById(R.id.chatinput);
+        btnExit = (Button) findViewById(R.id.btnExit);
         ListView listView = (ListView) findViewById(R.id.lvChat);
         permissionHandler = new PermissionHandler(this.getApplicationContext());
         chatAdapter = new ChatListViewAdapter(this, getLayoutInflater(), (ArrayList<ChatItem>) chat);
-        TextView txtSatosi = (TextView) findViewById(R.id.txtSatosi);
+        satosi = (TextView) findViewById(R.id.txtSatosi);
         Intent intent = new Intent();
         String intentsatosi = intent.getStringExtra("getSatosi");
-        txtSatosi.setText(intentsatosi);
+        satosi.setText(intentsatosi);
 
 
 
@@ -99,13 +108,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void test(){
 
-        KeyManager manager = ((TheSquareApplication) this.getApplication()).keyManager;
-        ApiHandler handler = new ApiHandler(manager, this);
+        manager = ((TheSquareApplication) this.getApplication()).keyManager;
+        handler = new ApiHandler(manager, this);
 
         handler.startStream("Stream 1", new StreamResponse() {
             @Override
             public void on(StreamModel streamModel) {
-                Log.e(TAG, streamModel.toString());
+                chatSocket = new ChatSocket(streamModel.getChatserver(), streamModel.getId(), manager, handler);
+                chatSocket.socketConnect();
+                Log.e("gekke chat", streamModel.toString());
             }
         });
     }
@@ -138,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
     public void onCaptureClick(View view) {
         if (!isStarted){
             stopWatch.setBase(SystemClock.elapsedRealtime());
-
+            this.test();
             stopWatch.start();
             isStarted = true;
         }
@@ -150,7 +161,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        if(streamModel != null) {
+            handler.stopStream(streamModel.getId());
+        }
         try {
             recorder.stop();
         } catch (InterruptedException e) {
@@ -160,4 +173,5 @@ public class MainActivity extends AppCompatActivity {
         recorder.releaseMediaRecorder();
         recorder.releaseCamera();
     }
+
 }

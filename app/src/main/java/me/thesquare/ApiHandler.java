@@ -14,10 +14,17 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.spongycastle.util.io.pem.PemObject;
+import org.spongycastle.util.io.pem.PemReader;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,7 +81,9 @@ public class ApiHandler {
 
                     String payload = response.getString("payload");
                     JSONObject payloadObj = new JSONObject(payload);
-
+//                    JSONObject chatHostObj = new JSONObject("chatServer");
+//                    String hostname = chatHostObj.getString("hostname");
+//                    Log.d("TestHost", hostname);
                     if(!payloadObj.getBoolean("success")) {
                         callback.on(false, payloadObj);
                         return;
@@ -174,8 +183,8 @@ public class ApiHandler {
 
     public void register(final UserModel userModel, final RegisterResponse callback) {
         HashMap<String, String> params = new HashMap<>();
-
-        params.put("name", userModel.getUsername());
+        String getuser = userModel.getUsername();
+        params.put("name", getuser);
         HashMap<String, String> requestBody = new HashMap<>();
 
         JSONObject parameters = new JSONObject(params);
@@ -231,7 +240,43 @@ public class ApiHandler {
                         JSONObject streamData = data.getJSONObject("stream");
                         stream.setId(streamData.getString("id"));
                         stream.setTitle(streamData.getString("title"));
+                        JSONObject chatserver = streamData.getJSONObject("chatServer");
+                        String hostname = chatserver.getString("hostname");
+                        stream.setChatServer(hostname);
+                        callback.on(stream);
+                    } catch (JSONException e) {
+                        Log.d(TAG, e.getMessage());
+                    }
 
+                    return;
+                }
+
+                try {
+                    if(data.getJSONObject("error").getString("code").equals("alreadyStreaming")) {
+                        getStream(data.getString("streamId"), callback);
+                        return;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.d(API_TAG, "api not successful\n"+data.toString());
+            }
+        });
+    }
+
+    public void getStream(String streamId, final StreamResponse callback) {
+        request(Request.Method.GET, "/v1/streams/"+streamId, null, new ApiResponse(){
+            @Override
+            public void on(boolean success, JSONObject data) {
+                if(success) {
+                    try {
+                        StreamModel stream = new StreamModel();
+                        JSONObject streamData = data.getJSONObject("stream");
+                        stream.setId(streamData.getString("id"));
+                        stream.setTitle(streamData.getString("title"));
+                        JSONObject chatserver = streamData.getJSONObject("chatServer");
+                        String hostname = chatserver.getString("hostname");
+                        stream.setChatServer(hostname);
                         callback.on(stream);
                     } catch (JSONException e) {
                         Log.d(TAG, e.getMessage());
@@ -246,8 +291,6 @@ public class ApiHandler {
     }
 
     public void getLoggedInUser(final UserResponse callback) {
-      ;
-
         request(Request.Method.GET, "/v1/me", null, new ApiResponse(){
             @Override
             public void on(boolean success, JSONObject data) {
@@ -284,5 +327,51 @@ public class ApiHandler {
             }
         });
     }
+    public void stopStream(String streamID) {
+        request(Request.Method.DELETE, "/v1/streams/"+ streamID , null, new ApiResponse(){
+            @Override
+            public void on(boolean success, JSONObject data) {
+                if(success) {
+                    Log.d(TAG, "Stream deleted!");
+                    return;
+                }
+                Log.d(API_TAG, "api not successful\n"+data.toString());
+            }
+        });
+    }
 
+    public void getUser(String userId, final UserResponse callback) {
+        request(Request.Method.GET, "/v1/users/"+ userId , null, new ApiResponse(){
+            @Override
+            public void on(boolean success, JSONObject data) {
+                if(success) {
+                    try {
+                        UserModel user = new UserModel();
+                        JSONObject userData = data.getJSONObject("user");
+                        user.setId(userData.getString("id"));
+                        user.setUsername(userData.getString("name"));
+                        try {
+                            String stringDecoded = new String(Base64.decode(userData.getString("publicKey").getBytes("UTF-8"), Base64.NO_WRAP), "UTF-8");
+                            PemReader pemReader = new PemReader(new StringReader(stringDecoded));
+                            PemObject pemObject = pemReader.readPemObject();
+
+                            KeyFactory kf = KeyFactory.getInstance("RSA", "BC");
+                            byte[] publicKeyContent = pemObject.getContent();
+
+                            X509EncodedKeySpec spec = new X509EncodedKeySpec(publicKeyContent);
+                            user.setPublicKey(kf.generatePublic(spec).getEncoded());
+                        } catch (NoSuchAlgorithmException | IOException | NoSuchProviderException | InvalidKeySpecException e) {
+                            e.printStackTrace();
+                        }
+                        callback.on(user);
+                    } catch (JSONException e) {
+                        Log.d(TAG, e.getMessage());
+                    }
+
+                    return;
+                }
+                Log.d(API_TAG, "api not successful\n"+data.toString());
+            }
+        });
+    }
 }
