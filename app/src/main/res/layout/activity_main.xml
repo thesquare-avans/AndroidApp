@@ -8,7 +8,7 @@
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:keepScreenOn="true"
-    tools:context="me.thesquare.MainActivity">
+    tools:context="me.thesquare.activities.MainActivity">
 
     <TextureView
         android:id="@+id/texture"

@@ -1,4 +1,4 @@
-package me.thesquare;
+package me.thesquare.activities;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -24,6 +24,8 @@ import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import me.thesquare.R;
+import me.thesquare.managers.PermissionHandler;
 
 /**
  * Created by jensderond on 13/06/2017.

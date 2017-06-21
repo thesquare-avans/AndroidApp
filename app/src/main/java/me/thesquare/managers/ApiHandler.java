@@ -1,4 +1,4 @@
-package me.thesquare;
+package me.thesquare.managers;
 
 import android.content.Context;
 import android.util.Base64;
@@ -28,9 +28,11 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
 
-import me.thesquare.ApiResponses.RegisterResponse;
-import me.thesquare.ApiResponses.StreamResponse;
-import me.thesquare.ApiResponses.UserResponse;
+import me.thesquare.interfaces.ApiResponse;
+import me.thesquare.interfaces.RegisterResponse;
+import me.thesquare.interfaces.StreamResponse;
+import me.thesquare.interfaces.UserResponse;
+import me.thesquare.managers.KeyManager;
 import me.thesquare.models.StreamModel;
 import me.thesquare.models.UserModel;
 

@@ -1,4 +1,4 @@
-package me.thesquare.ApiResponses;
+package me.thesquare.interfaces;
 
 /**
  * Created by larsh on 20-6-2017.

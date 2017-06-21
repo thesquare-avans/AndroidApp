@@ -1,4 +1,4 @@
-package me.thesquare;
+package me.thesquare.managers;
 
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
@@ -9,6 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.List;
+
+import me.thesquare.interfaces.FragmentWriter;
+
 import static java.lang.Thread.sleep;
 
 /**

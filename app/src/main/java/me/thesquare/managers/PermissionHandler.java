@@ -1,7 +1,6 @@
-package me.thesquare;
+package me.thesquare.managers;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
@@ -11,6 +10,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import me.thesquare.activities.PermissionsActivity;
 import pub.devrel.easypermissions.EasyPermissions;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;

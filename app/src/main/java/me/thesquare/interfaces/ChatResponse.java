@@ -1,4 +1,4 @@
-package me.thesquare;
+package me.thesquare.interfaces;
 
 import org.json.JSONObject;
 

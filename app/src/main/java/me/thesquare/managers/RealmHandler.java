@@ -1,4 +1,4 @@
-package me.thesquare;
+package me.thesquare.managers;
 
 import java.util.List;
 

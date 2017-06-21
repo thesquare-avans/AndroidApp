@@ -1,4 +1,4 @@
-package me.thesquare;
+package me.thesquare.interfaces;
 
 /**
  * Created by larsh on 13-6-2017.

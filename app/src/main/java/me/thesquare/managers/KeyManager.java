@@ -1,4 +1,4 @@
-package me.thesquare;
+package me.thesquare.managers;
 
 import android.util.Log;
 import org.json.JSONException;

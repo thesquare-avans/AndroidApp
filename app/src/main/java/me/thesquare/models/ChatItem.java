@@ -1,4 +1,4 @@
-package me.thesquare;
+package me.thesquare.models;
 
 /**
  * Created by larsh on 8-6-2017.

@@ -1,9 +1,6 @@
-package me.thesquare;
-
-import android.app.Activity;
+package me.thesquare.activities;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 
 import android.os.Bundle;
@@ -13,22 +10,29 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import me.thesquare.ApiResponses.StreamResponse;
-import me.thesquare.ApiResponses.UserResponse;
+
+import me.thesquare.managers.ChatSocket;
+import me.thesquare.R;
+import me.thesquare.TheSquareApplication;
+import me.thesquare.adapters.ChatListViewAdapter;
+import me.thesquare.interfaces.StreamResponse;
+import me.thesquare.interfaces.UserResponse;
+import me.thesquare.managers.ApiHandler;
+import me.thesquare.managers.FSDClient;
+import me.thesquare.managers.KeyManager;
+import me.thesquare.managers.PermissionHandler;
+import me.thesquare.managers.Recorder;
+import me.thesquare.models.ChatItem;
 import me.thesquare.models.StreamModel;
 import me.thesquare.models.UserModel;
 

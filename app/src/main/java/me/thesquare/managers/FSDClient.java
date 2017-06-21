@@ -1,20 +1,13 @@
-package me.thesquare;
+package me.thesquare.managers;
 
 import android.util.Log;
 
-import java.io.IOException;
 import java.io.OutputStream;
-import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.security.InvalidKeyException;
-import java.security.KeyFactory;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.Signature;
-import java.security.SignatureException;
-import java.util.Arrays;
+
+import me.thesquare.interfaces.FragmentWriter;
 
 /**
  * Created by Anthony on 13-6-2017.

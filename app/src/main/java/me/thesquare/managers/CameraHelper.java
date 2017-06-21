@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.thesquare;
+package me.thesquare.managers;
 
 import android.annotation.TargetApi;
 import android.hardware.Camera;

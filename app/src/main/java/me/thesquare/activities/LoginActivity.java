@@ -1,18 +1,15 @@
-package me.thesquare;
+package me.thesquare.activities;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import org.json.JSONObject;
 
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -24,8 +21,13 @@ import java.util.Objects;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import me.thesquare.ApiResponses.RegisterResponse;
-import me.thesquare.ApiResponses.UserResponse;
+import me.thesquare.R;
+import me.thesquare.TheSquareApplication;
+import me.thesquare.interfaces.RegisterResponse;
+import me.thesquare.interfaces.UserResponse;
+import me.thesquare.managers.ApiHandler;
+import me.thesquare.managers.KeyManager;
+import me.thesquare.managers.PermissionHandler;
 import me.thesquare.models.UserModel;
 
 public class LoginActivity extends AppCompatActivity {
@@ -146,7 +148,7 @@ public class LoginActivity extends AppCompatActivity {
             apihandler.register(user, new RegisterResponse(){
                 @Override
                 public void on(){
-                    Realm realm = Realm.getDefaultInstance();
+                    realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
                     realm.insert(user);
                     realm.commitTransaction();

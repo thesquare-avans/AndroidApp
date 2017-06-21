@@ -1,4 +1,4 @@
-package me.thesquare;
+package me.thesquare.adapters;
 
 import android.content.Context;
 import android.util.Log;
@@ -9,6 +9,9 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+
+import me.thesquare.R;
+import me.thesquare.models.ChatItem;
 
 public class ChatListViewAdapter extends BaseAdapter {
 

@@ -1,8 +1,6 @@
-package me.thesquare;
+package me.thesquare.interfaces;
 
 import org.json.JSONObject;
-
-import me.thesquare.models.UserModel;
 
 /**
  * Created by Cliff Sestig on 19-Jun-17.

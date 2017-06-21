@@ -1,10 +1,9 @@
-package me.thesquare;
+package me.thesquare.managers;
 
 /**
  * Created by ruben on 20-6-2017.
  */
 
-import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
@@ -20,7 +19,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
-import me.thesquare.ApiResponses.UserResponse;
+import me.thesquare.activities.MainActivity;
+import me.thesquare.interfaces.ChatResponse;
+import me.thesquare.interfaces.UserResponse;
+import me.thesquare.managers.ApiHandler;
+import me.thesquare.managers.KeyManager;
 import me.thesquare.models.UserModel;
 
 public class ChatSocket {
