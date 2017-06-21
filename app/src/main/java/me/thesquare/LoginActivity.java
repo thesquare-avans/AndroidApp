@@ -98,7 +98,8 @@ public class LoginActivity extends AppCompatActivity {
                            if(userModel != null)
                            {
                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                               intent.putExtra("getSatosi",userModel.getSatoshi() );
+                               String satoshi = Integer.toString(userModel.getSatoshi());
+                               intent.putExtra("getSatoshi", satoshi);
                                startActivity(intent);
                                finish();
                            }
