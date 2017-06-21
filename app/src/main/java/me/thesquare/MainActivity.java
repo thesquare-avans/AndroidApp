@@ -1,7 +1,11 @@
 package me.thesquare;
 
 import android.app.Activity;
+
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.os.SystemClock;
@@ -23,9 +27,10 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-
 import me.thesquare.ApiResponses.StreamResponse;
+import me.thesquare.ApiResponses.UserResponse;
 import me.thesquare.models.StreamModel;
+import me.thesquare.models.UserModel;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -46,12 +51,19 @@ public class MainActivity extends AppCompatActivity {
     private Button btnExit;
     private KeyManager manager;
 
+    private String current_user;
+
+    private Socket serverConnection;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         isStarted = false;
         super.onCreate(savedInstanceState);
 
+        SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        current_user = sharedPref.getString("cur_user", null);
         setContentView(R.layout.activity_main);
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .detectNetwork() // or .detectAll() for all detectable problems
@@ -61,7 +73,33 @@ public class MainActivity extends AppCompatActivity {
 
         TextureView textureView = (TextureView) findViewById(R.id.texture);
         stopWatch = (Chronometer) findViewById(R.id.stopWatch);
+        stopWatch.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener()
+        {
 
+            KeyManager keyManager = ((TheSquareApplication) getApplication()).keyManager;
+
+            @Override
+            public void onChronometerTick(Chronometer chronometer)
+            {
+                int elapsedMillis = (int) (SystemClock.elapsedRealtime() - chronometer.getBase());
+                int seconds = (int) elapsedMillis / 1000;
+
+                if (seconds % 3600 == 0 && seconds != 0){
+                    ApiHandler apihandler = new ApiHandler(keyManager, getApplicationContext());
+                    apihandler.getLoggedInUser(new UserResponse() {
+                        @Override
+                        public void on(UserModel userModel) {
+                            if(userModel != null)
+                            {
+                                String satoshi = Integer.toString(userModel.getSatoshi());
+                                TextView txtSatoshi = (TextView) findViewById(R.id.txtSatoshi);
+                                txtSatoshi.setText(satoshi);
+                            }
+                        }
+                    });
+                }
+            }
+        });
         chatInput = (EditText) findViewById(R.id.chatinput);
         btnExit = (Button) findViewById(R.id.btnExit);
         ListView listView = (ListView) findViewById(R.id.lvChat);
@@ -75,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         try {
-            Socket serverConnection = new Socket(SERVER_IP, 1234);
+            serverConnection = new Socket(SERVER_IP, 1234);
             fsdClient = new FSDClient(null, serverConnection.getOutputStream());
         } catch (IOException e) {
             Log.d(TAG, e.getMessage());
@@ -111,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         manager = ((TheSquareApplication) this.getApplication()).keyManager;
         handler = new ApiHandler(manager, this);
 
-        handler.startStream("Stream 1", new StreamResponse() {
+        handler.startStream(current_user + "_Stream", new StreamResponse() {
             @Override
             public void on(StreamModel streamModel) {
                 chatSocket = new ChatSocket(streamModel.getChatserver(), streamModel.getId(), manager, handler);
@@ -132,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
         ChatItem addChat = new ChatItem();
         addChat.setChatname("You");
         if(chatInput.getText().toString().equals("")){
-            Toast.makeText(this, "test", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please fill in the field!", Toast.LENGTH_SHORT).show();
         } else {
             addChat.setChattext(chatInput.getText().toString());
             chat.add(addChat);
@@ -172,6 +210,11 @@ public class MainActivity extends AppCompatActivity {
         }
         recorder.releaseMediaRecorder();
         recorder.releaseCamera();
+        try {
+            serverConnection.close();
+        } catch (IOException e) {
+            Log.d(TAG, e.getMessage());
+        }
     }
 
 }

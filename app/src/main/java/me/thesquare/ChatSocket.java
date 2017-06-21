@@ -8,8 +8,6 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Ack;
 import com.github.nkzawa.socketio.client.IO;
@@ -26,6 +24,7 @@ import me.thesquare.ApiResponses.UserResponse;
 import me.thesquare.models.UserModel;
 
 public class ChatSocket {
+    private static final String TAG = "ChatSocket";
     private Socket mSocket;
     private String chatHostName, streamid;
     private KeyManager keyManager;
@@ -206,15 +205,7 @@ public class ChatSocket {
         }
     }
 
-    public void socketDisconnect() {
+    public void socketDisconnect (){
         mSocket.disconnect();
-    }
-
-    public void attemptSend(String message) {
-        String trimmedMessage = message.trim();
-        if (TextUtils.isEmpty(message)) {
-            return;
-        }
-        mSocket.emit("new message", message);
     }
 }

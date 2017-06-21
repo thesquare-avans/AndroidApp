@@ -171,7 +171,6 @@ public class ApiHandler {
                 } catch (UnsupportedEncodingException e) {
                     Log.d(TAG, e.getMessage());
                 }
-                //String pubkey = new String(key);
                 headers.put("Content-Type", "application/json; charset=utf-8");
                 headers.put("X-PublicKey", key);
                 return headers;
@@ -183,17 +182,10 @@ public class ApiHandler {
 
     public void register(final UserModel userModel, final RegisterResponse callback) {
         HashMap<String, String> params = new HashMap<>();
-        String getuser = userModel.getUsername();
-        params.put("name", getuser);
-        HashMap<String, String> requestBody = new HashMap<>();
+
+        params.put("name", userModel.getUsername());
 
         JSONObject parameters = new JSONObject(params);
-        KeyFactory kf = null;
-        try {
-            kf = KeyFactory.getInstance("RSA");
-        } catch (NoSuchAlgorithmException e) {
-            Log.d(TAG, e.getMessage());
-        }
 
         request(Request.Method.POST, "/v1/register", parameters, new ApiResponse(){
             @Override
@@ -227,7 +219,6 @@ public class ApiHandler {
         HashMap<String, String> params = new HashMap<>();
 
         params.put("title", title);
-        HashMap<String, String> requestBody = new HashMap<>();
 
         JSONObject parameters = new JSONObject(params);
 
@@ -299,12 +290,13 @@ public class ApiHandler {
                         UserModel user = new UserModel();
                         JSONObject userData = data.getJSONObject("user");
                         user.setId(userData.getString("id"));
-                        if (user.getSatoshi() == 0) {
+                        if (userData.getInt("satoshi") == 0) {
                             user.setSatoshi(1);
                         }
                         else{
-                            user.setSatoshi(userData.getInt("satosi"));
+                            user.setSatoshi(userData.getInt("satoshi"));
                         }
+                        user.setSatoshi(userData.getInt("satoshi"));
                         user.setUsername(userData.getString("name"));
                         callback.on(user);
                     } catch (JSONException e) {

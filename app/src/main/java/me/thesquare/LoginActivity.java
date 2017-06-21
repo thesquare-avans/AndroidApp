@@ -24,11 +24,12 @@ import java.util.Objects;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import me.thesquare.ApiResponses.RegisterResponse;
-import me.thesquare.ApiResponses.UserResponse;
+import me.thesquare.apiresponses.RegisterResponse;
+import me.thesquare.apiresponses.UserResponse;
 import me.thesquare.models.UserModel;
 
 public class LoginActivity extends AppCompatActivity {
+    private static final String TAG = "LoginActivity";
     private Realm realm;
     private Button btnLogin;
     private EditText txtUsername;
@@ -98,7 +99,8 @@ public class LoginActivity extends AppCompatActivity {
                            if(userModel != null)
                            {
                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                               intent.putExtra("getSatosi",userModel.getSatoshi() );
+                               String satoshi = Integer.toString(userModel.getSatoshi());
+                               intent.putExtra("getSatoshi", satoshi);
                                startActivity(intent);
                                finish();
                            }
@@ -107,10 +109,10 @@ public class LoginActivity extends AppCompatActivity {
 
                     // kopieer waarden van callback UserModel naar de userModel die al bestaat
                 } catch (InvalidKeySpecException e) {
-                    e.printStackTrace();
+                    Log.d(TAG, e.getMessage());
                 }
             } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
+                Log.d(TAG, e.getMessage());
             }
             return true;
         }

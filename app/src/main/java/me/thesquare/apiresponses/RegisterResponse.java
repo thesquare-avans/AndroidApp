@@ -1,6 +1,4 @@
-package me.thesquare.ApiResponses;
-
-import me.thesquare.models.UserModel;
+package me.thesquare.apiresponses;
 
 /**
  * Created by larsh on 20-6-2017.

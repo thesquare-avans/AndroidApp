@@ -1,4 +1,4 @@
-package me.thesquare.ApiResponses;
+package me.thesquare.apiresponses;
 
 import me.thesquare.models.UserModel;
 

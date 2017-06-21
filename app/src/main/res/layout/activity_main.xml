@@ -79,7 +79,7 @@
         android:id="@+id/viewCounter"
         android:layout_width="150dp"
         android:layout_height="40dp"
-        android:layout_above="@+id/txtSatosi"
+        android:layout_above="@+id/txtSatoshi"
         android:layout_alignParentTop="true"
         android:layout_alignStart="@+id/imageView"
         android:layout_marginLeft="2dp"
@@ -106,7 +106,7 @@
         app:srcCompat="@drawable/image" />
 
     <TextView
-        android:id="@+id/txtSatosi"
+        android:id="@+id/txtSatoshi"
         android:layout_width="150dp"
         android:layout_height="40dp"
         android:layout_alignEnd="@+id/viewCounter"
@@ -142,6 +142,6 @@
         android:id="@+id/seperator2"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_alignBottom="@+id/txtSatosi"
+        android:layout_alignBottom="@+id/txtSatoshi"
         android:background="@android:color/darker_gray" />
 </RelativeLayout>
