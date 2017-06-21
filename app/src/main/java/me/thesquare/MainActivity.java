@@ -127,7 +127,8 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, e.getMessage());
         }
 
-        listview.setAdapter(chatAdapter);
+        listView.setAdapter(chatAdapter);
+        startStream();
     }
 
     public void onPause() {
@@ -142,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         checkPermissions();
     }
 
-    private void test(){
+    private void startStream(){
 
         manager = ((TheSquareApplication) this.getApplication()).keyManager;
         handler = new ApiHandler(manager, this);
@@ -181,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendChat(){
         if(chatInput.getText().toString().equals("")){
-            Toast.makeText(this, "Please fill in the field!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please fill in the field.", Toast.LENGTH_SHORT).show();
         } else {
 
             AddChat("You", chatInput.getText().toString());
@@ -192,12 +193,9 @@ public class MainActivity extends AppCompatActivity {
     public void onCaptureClick(View view) {
         if (!isStarted){
             stopWatch.setBase(SystemClock.elapsedRealtime());
-            this.test();
+            recorder.start();
             stopWatch.start();
             isStarted = true;
-        }
-        else {
-            Toast.makeText(this, "test", Toast.LENGTH_SHORT).show();
         }
     }
 
