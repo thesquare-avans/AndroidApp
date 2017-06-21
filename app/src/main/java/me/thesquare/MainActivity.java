@@ -23,7 +23,6 @@ import java.util.List;
 
 import me.thesquare.ApiResponses.StreamResponse;
 import me.thesquare.models.StreamModel;
-import me.thesquare.models.UserModel;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -37,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private PermissionHandler permissionHandler;
     private Chronometer stopWatch;
     private boolean isStarted;
-    private JSONObject userMe;
+    private ChatSocket chatSocket;
 
 
     @Override
