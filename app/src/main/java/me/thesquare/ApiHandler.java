@@ -16,14 +16,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
-import me.thesquare.ApiResponses.RegisterResponse;
-import me.thesquare.ApiResponses.StreamResponse;
-import me.thesquare.ApiResponses.UserResponse;
+import me.thesquare.apiresponses.RegisterResponse;
+import me.thesquare.apiresponses.StreamResponse;
+import me.thesquare.apiresponses.UserResponse;
 import me.thesquare.models.StreamModel;
 import me.thesquare.models.UserModel;
 
@@ -162,7 +160,6 @@ public class ApiHandler {
                 } catch (UnsupportedEncodingException e) {
                     Log.d(TAG, e.getMessage());
                 }
-                //String pubkey = new String(key);
                 headers.put("Content-Type", "application/json; charset=utf-8");
                 headers.put("X-PublicKey", key);
                 return headers;
@@ -176,15 +173,8 @@ public class ApiHandler {
         HashMap<String, String> params = new HashMap<>();
 
         params.put("name", userModel.getUsername());
-        HashMap<String, String> requestBody = new HashMap<>();
 
         JSONObject parameters = new JSONObject(params);
-        KeyFactory kf = null;
-        try {
-            kf = KeyFactory.getInstance("RSA");
-        } catch (NoSuchAlgorithmException e) {
-            Log.d(TAG, e.getMessage());
-        }
 
         request(Request.Method.POST, "/v1/register", parameters, new ApiResponse(){
             @Override
@@ -218,7 +208,6 @@ public class ApiHandler {
         HashMap<String, String> params = new HashMap<>();
 
         params.put("title", title);
-        HashMap<String, String> requestBody = new HashMap<>();
 
         JSONObject parameters = new JSONObject(params);
 
@@ -246,7 +235,6 @@ public class ApiHandler {
     }
 
     public void getLoggedInUser(final UserResponse callback) {
-      ;
 
         request(Request.Method.GET, "/v1/me", null, new ApiResponse(){
             @Override

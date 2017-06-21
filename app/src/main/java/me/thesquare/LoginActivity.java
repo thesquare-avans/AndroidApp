@@ -24,11 +24,11 @@ import java.util.Objects;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import me.thesquare.ApiResponses.RegisterResponse;
-import me.thesquare.ApiResponses.UserResponse;
+import me.thesquare.apiresponses.RegisterResponse;
 import me.thesquare.models.UserModel;
 
 public class LoginActivity extends AppCompatActivity {
+    private static final String TAG = "LoginActivity";
     private Realm realm;
     private Button btnLogin;
     private EditText txtUsername;
@@ -107,10 +107,10 @@ public class LoginActivity extends AppCompatActivity {
 
                     // kopieer waarden van callback UserModel naar de userModel die al bestaat
                 } catch (InvalidKeySpecException e) {
-                    e.printStackTrace();
+                    Log.d(TAG, e.getMessage());
                 }
             } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
+                Log.d(TAG, e.getMessage());
             }
             return true;
         }

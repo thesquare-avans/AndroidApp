@@ -58,7 +58,7 @@ public class KeyManager {
             X509EncodedKeySpec spec = new X509EncodedKeySpec(publicKeyContent);
             this.serverPublicKey = kf.generatePublic(spec);
         } catch (NoSuchAlgorithmException | IOException | NoSuchProviderException | InvalidKeySpecException e) {
-            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
         }
     }
 

@@ -1,7 +1,5 @@
 package me.thesquare;
 
-import android.util.Log;
-
 import java.util.List;
 
 import io.realm.Realm;

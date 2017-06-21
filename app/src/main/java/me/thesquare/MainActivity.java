@@ -1,6 +1,5 @@
 package me.thesquare;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.os.SystemClock;
@@ -20,8 +19,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-
-import me.thesquare.ApiResponses.StreamResponse;
+import me.thesquare.apiresponses.StreamResponse;
 import me.thesquare.models.StreamModel;
 
 
@@ -37,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private Chronometer stopWatch;
     private boolean isStarted;
     private ChatSocket chatSocket;
+    private Socket serverConnection;
 
 
     @Override
@@ -66,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         try {
-            Socket serverConnection = new Socket(SERVER_IP, 1234);
+            serverConnection = new Socket(SERVER_IP, 1234);
             fsdClient = new FSDClient(null, serverConnection.getOutputStream());
         } catch (IOException e) {
             Log.d(TAG, e.getMessage());
@@ -159,5 +158,10 @@ public class MainActivity extends AppCompatActivity {
         }
         recorder.releaseMediaRecorder();
         recorder.releaseCamera();
+        try {
+            serverConnection.close();
+        } catch (IOException e) {
+            Log.d(TAG, e.getMessage());
+        }
     }
 }
