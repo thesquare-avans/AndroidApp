@@ -1,6 +1,10 @@
 package me.thesquare;
 
+
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.os.SystemClock;
@@ -11,6 +15,7 @@ import android.view.View;
 import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,7 +26,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import me.thesquare.apiresponses.StreamResponse;
+import me.thesquare.apiresponses.UserResponse;
 import me.thesquare.models.StreamModel;
+import me.thesquare.models.UserModel;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -36,7 +43,11 @@ public class MainActivity extends AppCompatActivity {
     private Chronometer stopWatch;
     private boolean isStarted;
     private ChatSocket chatSocket;
+
+    private String current_user;
+
     private Socket serverConnection;
+
 
 
     @Override
@@ -44,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
         isStarted = false;
         super.onCreate(savedInstanceState);
 
+        SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        current_user = sharedPref.getString("cur_user", null);
         setContentView(R.layout.activity_main);
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .detectNetwork() // or .detectAll() for all detectable problems
@@ -53,15 +66,41 @@ public class MainActivity extends AppCompatActivity {
 
         TextureView textureView = (TextureView) findViewById(R.id.texture);
         stopWatch = (Chronometer) findViewById(R.id.stopWatch);
+        stopWatch.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener()
+        {
 
+            KeyManager keyManager = ((TheSquareApplication) getApplication()).keyManager;
+
+            @Override
+            public void onChronometerTick(Chronometer chronometer)
+            {
+                int elapsedMillis = (int) (SystemClock.elapsedRealtime() - chronometer.getBase());
+                int seconds = (int) elapsedMillis / 1000;
+
+                if (seconds % 3600 == 0 && seconds != 0){
+                    ApiHandler apihandler = new ApiHandler(keyManager, getApplicationContext());
+                    apihandler.getLoggedInUser(new UserResponse() {
+                        @Override
+                        public void on(UserModel userModel) {
+                            if(userModel != null)
+                            {
+                                String satoshi = Integer.toString(userModel.getSatoshi());
+                                TextView txtSatoshi = (TextView) findViewById(R.id.txtSatoshi);
+                                txtSatoshi.setText(satoshi);
+                            }
+                        }
+                    });
+                }
+            }
+        });
         chatInput = (EditText) findViewById(R.id.chatinput);
         ListView listView = (ListView) findViewById(R.id.lvChat);
         permissionHandler = new PermissionHandler(this.getApplicationContext());
         chatAdapter = new ChatListViewAdapter(this, getLayoutInflater(), (ArrayList<ChatItem>) chat);
-        TextView txtSatosi = (TextView) findViewById(R.id.txtSatosi);
-        Intent intent = new Intent();
-        String intentsatosi = intent.getStringExtra("getSatosi");
-        txtSatosi.setText(intentsatosi);
+        TextView txtSatoshi = (TextView) findViewById(R.id.txtSatoshi);
+        Intent intent = getIntent();
+        String intentSatoshi = intent.getStringExtra("getSatoshi");
+        txtSatoshi.setText(intentSatoshi);
 
 
 
@@ -102,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         KeyManager manager = ((TheSquareApplication) this.getApplication()).keyManager;
         ApiHandler handler = new ApiHandler(manager, this);
 
-        handler.startStream("Stream 1", new StreamResponse() {
+        handler.startStream(current_user + "_Stream", new StreamResponse() {
             @Override
             public void on(StreamModel streamModel) {
                 Log.e(TAG, streamModel.toString());

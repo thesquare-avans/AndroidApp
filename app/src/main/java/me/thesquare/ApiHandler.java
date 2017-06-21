@@ -244,12 +244,13 @@ public class ApiHandler {
                         UserModel user = new UserModel();
                         JSONObject userData = data.getJSONObject("user");
                         user.setId(userData.getString("id"));
-                        if (user.getSatoshi() == 0) {
+                        if (userData.getInt("satoshi") == 0) {
                             user.setSatoshi(1);
                         }
                         else{
-                            user.setSatoshi(userData.getInt("satosi"));
+                            user.setSatoshi(userData.getInt("satoshi"));
                         }
+                        user.setSatoshi(userData.getInt("satoshi"));
                         user.setUsername(userData.getString("name"));
                         callback.on(user);
                     } catch (JSONException e) {
