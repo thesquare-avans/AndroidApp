@@ -91,7 +91,7 @@ public class Recorder implements Runnable {
                 mSupportedPreviewSizes, mPreview.getHeight(), mPreview.getWidth());
 
         // Use the same size for recording profile.
-        CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_LOW);
+        CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_480P);
         profile.videoFrameWidth = optimalSize.width;
         profile.videoFrameHeight = optimalSize.height;
 
