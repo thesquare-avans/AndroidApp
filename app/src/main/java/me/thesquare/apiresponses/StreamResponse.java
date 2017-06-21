@@ -1,4 +1,4 @@
-package me.thesquare.apiresponses;
+package me.thesquare.ApiResponses;
 
 import me.thesquare.models.StreamModel;
 

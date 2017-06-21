@@ -48,8 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView satosi;
     private ApiHandler handler;
     private StreamModel streamModel;
-    private Button btnExit;
     private KeyManager manager;
+    private ListView listview;
 
     private String current_user;
 
@@ -101,11 +101,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         chatInput = (EditText) findViewById(R.id.chatinput);
-        btnExit = (Button) findViewById(R.id.btnExit);
-        ListView listView = (ListView) findViewById(R.id.lvChat);
+        listview = (ListView) findViewById(R.id.lvChat);
         permissionHandler = new PermissionHandler(this.getApplicationContext());
         chatAdapter = new ChatListViewAdapter(this, getLayoutInflater(), (ArrayList<ChatItem>) chat);
-        satosi = (TextView) findViewById(R.id.txtSatosi);
+        satosi = (TextView) findViewById(R.id.txtSatoshi);
         Intent intent = new Intent();
         String intentsatosi = intent.getStringExtra("getSatosi");
         satosi.setText(intentsatosi);
@@ -128,8 +127,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, e.getMessage());
         }
 
-        listView.setAdapter(chatAdapter);
-        test();
+        listview.setAdapter(chatAdapter);
     }
 
     public void onPause() {
@@ -148,11 +146,12 @@ public class MainActivity extends AppCompatActivity {
 
         manager = ((TheSquareApplication) this.getApplication()).keyManager;
         handler = new ApiHandler(manager, this);
+        final MainActivity thisInstance = this;
 
         handler.startStream(current_user + "_Stream", new StreamResponse() {
             @Override
             public void on(StreamModel streamModel) {
-                chatSocket = new ChatSocket(streamModel.getChatserver(), streamModel.getId(), manager, handler);
+                chatSocket = new ChatSocket(streamModel.getChatserver(), streamModel.getId(), manager, handler, thisInstance);
                 chatSocket.socketConnect();
                 Log.e("gekke chat", streamModel.toString());
             }
@@ -166,21 +165,27 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void AddChat(View view){
+    public void AddChat(String username , String message){
         ChatItem addChat = new ChatItem();
-        addChat.setChatname("You");
+        addChat.setChatname(username);
+        addChat.setChattext(message);
+        chat.add(addChat);
+        int chatSize = chat.size();
+        if (chatSize >= 5) {
+            //chatAdapter.notifyDataSetChanged();
+            chat.remove(0);
+
+        }
+
+    }
+
+    public void sendChat(){
         if(chatInput.getText().toString().equals("")){
             Toast.makeText(this, "Please fill in the field!", Toast.LENGTH_SHORT).show();
         } else {
-            addChat.setChattext(chatInput.getText().toString());
-            chat.add(addChat);
+
+            AddChat("You", chatInput.getText().toString());
             chatInput.setText("");
-            chatAdapter.notifyDataSetChanged();
-            int chatSize = chat.size();
-            if (chatSize >= 5) {
-                chat.remove(0);
-                chatAdapter.notifyDataSetChanged();
-            }
         }
     }
 

@@ -30,14 +30,15 @@ public class ChatSocket {
     private KeyManager keyManager;
     private ApiHandler handler;
     private HashMap<String, UserModel> userCache;
+    private MainActivity mainActivity;
 
 
-    public ChatSocket(String chatHostName, String streamid, KeyManager keyManager, ApiHandler handler) {
+    public ChatSocket(String chatHostName, String streamid, KeyManager keyManager, ApiHandler handler, MainActivity mainActivity) {
         this.chatHostName = chatHostName;
         this.streamid = streamid;
         this.keyManager = keyManager;
         this.handler = handler;
-
+        this.mainActivity = mainActivity;
         this.userCache = new HashMap<>();
     }
 
@@ -134,7 +135,7 @@ public class ChatSocket {
                                     JSONObject senderBody = verifyBody(body.getJSONObject("data").getJSONObject("data"), sender.getPublicKey());
                                     Log.d("TheSquare-Chat", senderBody.toString());
                                     addChat(sender, senderBody.getString("message"));
-                                    // laat chat zien
+
                                     return;
                                 }
 
@@ -149,7 +150,6 @@ public class ChatSocket {
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
-                                        // laat chat zien
                                     }
                                 });
                             }
@@ -188,7 +188,7 @@ public class ChatSocket {
     }
 
     private void addChat(UserModel userModel, String message){
-
+        mainActivity.AddChat(userModel.getUsername(), message);
     }
 
     private void join() {

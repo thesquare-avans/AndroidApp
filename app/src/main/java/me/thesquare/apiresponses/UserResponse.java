@@ -1,4 +1,4 @@
-package me.thesquare.apiresponses;
+package me.thesquare.ApiResponses;
 
 import me.thesquare.models.UserModel;
 
@@ -8,4 +8,4 @@ import me.thesquare.models.UserModel;
 
 public interface UserResponse {
     void on(UserModel userModel);
-}
+        }

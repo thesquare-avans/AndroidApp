@@ -24,8 +24,8 @@ import java.util.Objects;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import me.thesquare.apiresponses.RegisterResponse;
-import me.thesquare.apiresponses.UserResponse;
+import me.thesquare.ApiResponses.RegisterResponse;
+import me.thesquare.ApiResponses.UserResponse;
 import me.thesquare.models.UserModel;
 
 public class LoginActivity extends AppCompatActivity {
