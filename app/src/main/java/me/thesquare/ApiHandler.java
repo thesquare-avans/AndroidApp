@@ -246,7 +246,7 @@ public class ApiHandler {
     }
 
     public void getLoggedInUser(final UserResponse callback) {
-        HashMap<String, String> params = new HashMap<>();
+      ;
 
         request(Request.Method.GET, "/v1/me", null, new ApiResponse(){
             @Override
@@ -256,8 +256,13 @@ public class ApiHandler {
                         UserModel user = new UserModel();
                         JSONObject userData = data.getJSONObject("user");
                         user.setId(userData.getString("id"));
-                        // TODO: zet alle velden die je terug krijgt van de API en je lokaal opslaat
-
+                        if (user.getSatoshi() == 0) {
+                            user.setSatoshi(1);
+                        }
+                        else{
+                            user.setSatoshi(userData.getInt("satosi"));
+                        }
+                        user.setUsername(userData.getString("name"));
                         callback.on(user);
                     } catch (JSONException e) {
                         Log.d(TAG, e.getMessage());

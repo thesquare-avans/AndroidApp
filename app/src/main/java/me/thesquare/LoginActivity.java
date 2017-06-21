@@ -4,12 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import org.json.JSONObject;
 
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -22,6 +25,7 @@ import java.util.Objects;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import me.thesquare.ApiResponses.RegisterResponse;
+import me.thesquare.ApiResponses.UserResponse;
 import me.thesquare.models.UserModel;
 
 public class LoginActivity extends AppCompatActivity {
@@ -46,9 +50,7 @@ public class LoginActivity extends AppCompatActivity {
 
         sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         current_user = sharedPref.getString("cur_user", null);
-        if(userExists(current_user)) {
-            return;
-        }
+        userExists(current_user);
 
         txtUsername = (EditText) findViewById(R.id.editText);
         btnLogin = (Button) findViewById(R.id.btnLogin);
@@ -56,8 +58,8 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if ( checkUsername() ){
+                    userExists(txtUsername.getText().toString());
                     addUser( txtUsername.getText().toString() );
-
                 }
                 else {
                     Toast toast =  Toast.makeText( getApplicationContext(), "Please fill in the login field.", Toast.LENGTH_SHORT);
@@ -71,11 +73,11 @@ public class LoginActivity extends AppCompatActivity {
 
         if (current_user != null) {
             RealmResults<UserModel> result = realm.where( UserModel.class ).equalTo( "username", current_user).findAll();
-            List<UserModel> user = realm.copyFromRealm(result);
+            final List<UserModel> user = realm.copyFromRealm(result);
             if(user.isEmpty()) {
                 return false;
             }
-            
+
             UserModel userModel = user.get(0);
 
             if(userModel == null) {
@@ -89,21 +91,29 @@ public class LoginActivity extends AppCompatActivity {
                     keyManager.setPublicKey(kf.generatePublic(new X509EncodedKeySpec(userModel.getPublicKey())));
                     keyManager.setPublicKeyPem(userModel.getPublicKeyPem());
 
-                    // TODO: kijk of user ook op server bestaat (/v1/me)
+                    apihandler = new ApiHandler(keyManager, this);
+                    apihandler.getLoggedInUser(new UserResponse() {
+                       @Override
+                       public void on(UserModel userModel) {
+                           if(userModel != null)
+                           {
+                               Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                               intent.putExtra("getSatosi",userModel.getSatoshi() );
+                               startActivity(intent);
+                               finish();
+                           }
+                       }
+                    });
+
                     // kopieer waarden van callback UserModel naar de userModel die al bestaat
                 } catch (InvalidKeySpecException e) {
                     e.printStackTrace();
                 }
-
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-                finish();
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
             }
             return true;
         }
-
         return false;
     }
 

@@ -1,7 +1,6 @@
 package me.thesquare;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.os.SystemClock;
@@ -13,13 +12,15 @@ import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 import java.net.Socket;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.realm.Realm;
 import me.thesquare.ApiResponses.StreamResponse;
 import me.thesquare.models.StreamModel;
 import me.thesquare.models.UserModel;
@@ -36,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     private PermissionHandler permissionHandler;
     private Chronometer stopWatch;
     private boolean isStarted;
+    private JSONObject userMe;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +54,16 @@ public class MainActivity extends AppCompatActivity {
 
         TextureView textureView = (TextureView) findViewById(R.id.texture);
         stopWatch = (Chronometer) findViewById(R.id.stopWatch);
-        chatInput = (EditText)findViewById(R.id.chatinput);
+
+        chatInput = (EditText) findViewById(R.id.chatinput);
         ListView listView = (ListView) findViewById(R.id.lvChat);
         permissionHandler = new PermissionHandler(this.getApplicationContext());
-        chatAdapter = new ChatListViewAdapter(this,getLayoutInflater(), (ArrayList<ChatItem>) chat);
+        chatAdapter = new ChatListViewAdapter(this, getLayoutInflater(), (ArrayList<ChatItem>) chat);
+        TextView txtSatosi = (TextView) findViewById(R.id.txtSatosi);
+        Intent intent = new Intent();
+        String intentsatosi = intent.getStringExtra("getSatosi");
+        txtSatosi.setText(intentsatosi);
+
 
 
         try {
