@@ -73,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
 
         TextureView textureView = (TextureView) findViewById(R.id.texture);
         stopWatch = (Chronometer) findViewById(R.id.stopWatch);
+        TextView txtSatoshi = (TextView) findViewById(R.id.txtSatoshi);
+        txtSatoshi.setText(1 +"");
         stopWatch.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener()
         {
 
@@ -104,10 +106,6 @@ public class MainActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.lvChat);
         permissionHandler = new PermissionHandler(this.getApplicationContext());
         chatAdapter = new ChatListViewAdapter(this, getLayoutInflater(), (ArrayList<ChatItem>) chat);
-        satosi = (TextView) findViewById(R.id.txtSatoshi);
-        Intent intent = new Intent();
-        String intentsatosi = intent.getStringExtra("getSatosi");
-        satosi.setText(intentsatosi);
 
 
 
